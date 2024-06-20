@@ -1,7 +1,7 @@
 import { faArrowLeft, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import {
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Textarea } from "./ui/textarea";
 
 const STEPS_AMOUNT = 4;
 
@@ -56,10 +57,19 @@ interface FormValues {
 
 const StepForm: React.FC = () => {
   const [formStep, setFormStep] = React.useState<number>(0);
+
+  const [hasClinicalEngineering, setHasClinicalEngineering] =
+    useState<string>("option-two");
+
+  const handleFirstChange = (value: string) => {
+    setHasClinicalEngineering(value);
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
+    watch,
   } = useForm<FormValues>({
     mode: "onChange",
   });
@@ -121,7 +131,7 @@ const StepForm: React.FC = () => {
                   {...register("username", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
-                      message: "Informe o seu Nome e Sobrenome",
+                      message: "Informe o seu Nome e sobrenome",
                       value: 3,
                     },
                   })}
@@ -139,6 +149,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="hospitalEmail"
+                    type="email"
                     {...register("hospitalEmail", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
@@ -163,7 +174,7 @@ const StepForm: React.FC = () => {
                     {...register("hospitalContact", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
-                        message: "Informe um número válido",
+                        message: "Informe um número válido!",
                         value: 10,
                       },
                     })}
@@ -184,7 +195,10 @@ const StepForm: React.FC = () => {
                   id="hospitalName"
                   {...register("hospitalName", {
                     required: { message: "Preencha este campo", value: true },
-                    minLength: { message: "Minimum length 3", value: 3 },
+                    minLength: {
+                      message: "Preencha com o nome do hospital",
+                      value: 3,
+                    },
                   })}
                 />
                 {errors.hospitalName && (
@@ -260,7 +274,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="number"
-                    {...register("username", {
+                    {...register("number", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe um número válido",
@@ -370,32 +384,52 @@ const StepForm: React.FC = () => {
           )}
           {formStep >= 1 && (
             <section className={`${formStep === 1 ? "block" : "hidden"}`}>
-              <h2 className="font-semibold text-3xl mb-8">
-                Sobre a instituição
-              </h2>
-              <div className="flex flex-col">
-                <Label htmlFor="username">
-                  Quantidade de salas cirúrgicas:
+              <h2 className="font-semibold text-3xl mb-8">Momento atual...</h2>
+              <div className="flex flex-col mt-4">
+                <Label htmlFor="username" className="text-base mb-2">
+                  Qual o momento atual do empreendimento?
                 </Label>
-                <Input
-                  id="address"
-                  placeholder="Ex.: 12"
-                  {...register("address", {
-                    required: { message: "Preencha este campo", value: true },
-                  })}
-                />
-                {errors.address && (
+                <Select>
+                  <SelectTrigger className="">
+                    <SelectValue placeholder="Selecione uma opção" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Elaboração projetos">
+                      Elaboração projetos
+                    </SelectItem>
+                    <SelectItem value="Visita técnica para avaliação diagnóstica">
+                      Visita técnica para avaliação diagnóstica
+                    </SelectItem>
+                    <SelectItem value="Dimensionamento e especificação técnica dos equipamentos para aquisição">
+                      Dimensionamento e especificação técnica dos equipamentos
+                      para aquisição
+                    </SelectItem>
+                    <SelectItem value="Análise técnica financeira comparativa dos equipamentos">
+                      Análise técnica financeira comparativa dos equipamentos
+                    </SelectItem>
+                    <SelectItem value="Comissionamento das instalações">
+                      Comissionamento das instalações
+                    </SelectItem>
+                    <SelectItem value="Outro momento">Outro momento</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {errors.username && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.address.message}
+                    {errors.username.message}
                   </p>
                 )}
               </div>
-
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username">
-                  É realizado o processamento de tecidos?
+                <Label htmlFor="username" className="text-base mb-2">
+                  Possui engenharia clínica para apoiar o processo de seleção
+                  dos equipamentos?
                 </Label>
-                <RadioGroup defaultValue="option-one" className="flex mt-4">
+                <RadioGroup
+                  className="flex mt-2"
+                  defaultValue={hasClinicalEngineering}
+                  onValueChange={handleFirstChange}
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="option-one" id="option-one" />
                     <Label htmlFor="option-one">Sim</Label>
@@ -406,12 +440,48 @@ const StepForm: React.FC = () => {
                   </div>
                 </RadioGroup>
               </div>
-
+              {hasClinicalEngineering === "option-one" && (
+                <div className="flex flex-col mt-4">
+                  <Label htmlFor="username" className="text-base mb-2">
+                    A sua Engenharia Clínica é própria ou terceirizada?
+                  </Label>
+                  <RadioGroup defaultValue="option-three" className="flex mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="option-three" id="option-two" />
+                      <Label htmlFor="option-three">Não se aplica</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="option-one" id="option-one" />
+                      <Label htmlFor="option-one">Sim</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="option-two" id="option-two" />
+                      <Label htmlFor="option-two">Não</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username">
+                <Label htmlFor="username" className="text-base mb-2">
+                  Do que sente mais falta no suporte da engenharia clinica?
+                </Label>
+                <Textarea
+                  placeholder="Escreva aqui..."
+                  id="address"
+                  {...register("address", {})}
+                />
+                {/* {errors.address && (
+                  <p className="text-sm text-red-600 mt-2">
+                    {errors.address.message}
+                  </p>
+                )} */}
+              </div>
+              {/* 
+              <div className="flex flex-col mt-4">
+                <Label htmlFor="username" className="text-base">
                   Qual o intervalo de pico de funcionamento da CME em horas?
                   <br />{" "}
-                  <span className="text-xs text-red-500">
+                  <span className="text-sm text-red-500">
                     (período de processamento de 90% do material)
                   </span>
                 </Label>
@@ -427,7 +497,7 @@ const StepForm: React.FC = () => {
                     {errors.address.message}
                   </p>
                 )}
-              </div>
+              </div> */}
 
               <FinishSectionButton
                 onClick={handleStepCompletion}
@@ -438,6 +508,104 @@ const StepForm: React.FC = () => {
             </section>
           )}
           {formStep >= 2 && (
+            <section className={`${formStep === 2 ? "block" : "hidden"}`}>
+              <h2 className="font-semibold text-3xl mb-8">Para finalizar</h2>
+              <div className="flex flex-col lg:flex-row lg:gap-4">
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                    Nº de salas cirúrgicas
+                  </Label>
+                  <Input
+                    id="hospitalEmail"
+                    type="email"
+                    {...register("hospitalEmail", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Preencha com um e-mail válido!",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalEmail && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalEmail.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                    Nº de cirurgias/sala/dia
+                  </Label>
+                  <Input
+                    id="hospitalContact"
+                    {...register("hospitalContact", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Informe um número válido!",
+                        value: 10,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalContact && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalContact.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="block mt-6">
+                <input
+                  {...register("toc", {
+                    required: true,
+                  })}
+                  name="toc"
+                  className="p-3 text-[#a7b928] rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
+                  type="checkbox"
+                />
+                <span>
+                  Estou ciente que posso gerar esse relatório apenas uma vez.
+                </span>
+              </div>
+              <div className="block mt-6">
+                <input
+                  {...register("pp", {
+                    required: true,
+                  })}
+                  name="pp"
+                  className="p-3 text-[#a7b928]  rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
+                  type="checkbox"
+                />
+                <span>Autorizo a Equipacare entrar em contato comigo.</span>
+              </div>
+              <button
+                disabled={!isValid}
+                type="submit"
+                className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
+                Gerar cálculo baseado nas informações
+              </button>
+            </section>
+          )}
+          {formStep === 4 && (
+            <section>
+              <h2 className="font-semibold text-3xl mb-8">
+                Confira o resultado!
+              </h2>
+              <p>Informações geradas baseada nos cálculos...</p>
+              <button
+                type="submit"
+                className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
+              >
+                <FontAwesomeIcon icon={faChartPie} className="mr-2" size="lg" />
+                Solicitar um relatório detalhado
+              </button>
+            </section>
+          )}
+
+          {formStep >= 3 && (
             <section className={`${formStep === 2 ? "block" : "hidden"}`}>
               <h2 className="font-semibold text-3xl mb-8">
                 Estamos quase lá...
@@ -475,7 +643,7 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {formStep === 3 && (
+          {formStep === 4 && (
             <section>
               <h2 className="font-semibold text-3xl mb-8">
                 Confira o resultado!
@@ -490,10 +658,10 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {/* <p>{isValid ? "Valid" : "Invalid"}</p>
+          <p>{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>

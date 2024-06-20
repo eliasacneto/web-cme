@@ -5,7 +5,6 @@ import {
   faLinkedin,
   faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
-import React from "react";
 
 const navLinks = [
   {

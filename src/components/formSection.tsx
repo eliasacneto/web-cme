@@ -1,4 +1,3 @@
-import React from "react";
 import GreenButton from "./greenButton";
 import StepForm from "./stepForm";
 

@@ -1,5 +1,3 @@
-import React from "react";
-
 interface GreenButtonProps {
   text: string;
   icon?: string;
