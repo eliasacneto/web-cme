@@ -13,7 +13,7 @@ import {
 } from "./ui/select";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
-const STEPS_AMOUNT = 3;
+const STEPS_AMOUNT = 4;
 
 interface FinishSectionButtonProps {
   onClick: () => void;
@@ -40,7 +40,16 @@ const FinishSectionButton: React.FC<FinishSectionButtonProps> = ({
 
 interface FormValues {
   username: string;
+  hospitalName: string;
+  hospitalEmail: string;
+  hospitalContact: string;
+  cnpj: string;
+  role: string;
   address: string;
+  cep: string;
+  number: string;
+  street: string;
+  neighborhood: string;
   toc: boolean;
   pp: boolean;
 }
@@ -104,12 +113,17 @@ const StepForm: React.FC = () => {
                 Preencha as informações
               </h2>
               <div className="flex flex-col">
-                <Label htmlFor="username">Nome completo:</Label>
+                <Label htmlFor="username" className="text-base mb-2">
+                  Nome completo:
+                </Label>
                 <Input
                   id="username"
                   {...register("username", {
                     required: { message: "Preencha este campo", value: true },
-                    minLength: { message: "Minimum length 3", value: 3 },
+                    minLength: {
+                      message: "Informe o seu Nome e Sobrenome",
+                      value: 3,
+                    },
                   })}
                 />
                 {errors.username && (
@@ -120,157 +134,193 @@ const StepForm: React.FC = () => {
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">E-mail do hospital:</Label>
+                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                    E-mail do hospital:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="hospitalEmail"
+                    {...register("hospitalEmail", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Preencha com um e-mail válido!",
+                        value: 3,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.hospitalEmail && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.hospitalEmail.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">Contato:</Label>
+                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                    Contato:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="hospitalContact"
+                    {...register("hospitalContact", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Informe um número válido",
+                        value: 10,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.hospitalContact && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.hospitalContact.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username">Nome do hospital:</Label>
+                <Label htmlFor="hospitalName" className="text-base mb-2">
+                  Nome do hospital:
+                </Label>
                 <Input
-                  id="username"
-                  {...register("username", {
+                  id="hospitalName"
+                  {...register("hospitalName", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: { message: "Minimum length 3", value: 3 },
                   })}
                 />
-                {errors.username && (
+                {errors.hospitalName && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.username.message}
+                    {errors.hospitalName.message}
                   </p>
                 )}
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">CNPJ:</Label>
+                  <Label htmlFor="username" className="text-base mb-2">
+                    CNPJ:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="cnpj"
+                    {...register("cnpj", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Informe um documento válido",
+                        value: 14,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.cnpj && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.cnpj.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">Seu cargo atual:</Label>
+                  <Label htmlFor="role" className="text-base mb-2">
+                    Seu cargo atual:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="role"
+                    {...register("role", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: { message: "Informe um cargo", value: 3 },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.role && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.role.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">CEP:</Label>
+                  <Label htmlFor="cep" className="text-base mb-2">
+                    CEP:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="cep"
+                    {...register("cep", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: { message: "Informe um cep válido", value: 8 },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.cep && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.cep.message}
                     </p>
                   )}
                 </div>
 
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">Número:</Label>
+                  <Label htmlFor="number" className="text-base mb-2">
+                    Número:
+                  </Label>
                   <Input
-                    id="username"
+                    id="number"
                     {...register("username", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Informe um número válido",
+                        value: 1,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.number && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.number.message}
                     </p>
                   )}
                 </div>
               </div>{" "}
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">Avenida/Rua:</Label>
+                  <Label htmlFor="street" className="text-base mb-2">
+                    Avenida/Rua:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="street"
+                    {...register("street", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Informe a rua ou avenida",
+                        value: 3,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.street && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.street.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username">Bairro:</Label>
+                  <Label htmlFor="neighborhood" className="text-base mb-2">
+                    Bairro:
+                  </Label>
                   <Input
-                    id="username"
-                    {...register("username", {
+                    id="neighborhood"
+                    {...register("neighborhood", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Minimum length 3", value: 3 },
+                      minLength: {
+                        message: "Informe o nome do Bairro",
+                        value: 3,
+                      },
                     })}
                   />
 
-                  {errors.username && (
+                  {errors.neighborhood && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.neighborhood.message}
                     </p>
                   )}
                 </div>
               </div>
-              <div className="flex flex-col lg:flex-row lg:gap-4">
+              {/* <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4">
                   <Label htmlFor="username">Segmento da empresa:</Label>
                   <Select>
@@ -309,7 +359,7 @@ const StepForm: React.FC = () => {
                     </p>
                   )}
                 </div>
-              </div>
+              </div> */}
               <FinishSectionButton
                 onClick={handleStepCompletion}
                 isDisabled={!isValid}
