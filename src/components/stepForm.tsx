@@ -88,7 +88,7 @@ const StepForm: React.FC = () => {
   };
 
   return (
-    <div className="mx-8 max-w-xl w-full mt-24 mb-24 rounded-lg shadow-2xl bg-white overflow-hidden z-10">
+    <div className=" w-full mt-10 mb-24 rounded-lg shadow-2xl bg-white overflow-hidden mx-3 z-10">
       <div className="h-2 bg-gray-200 w-full overflow-hidden">
         <div
           style={{ width: `${(formStep / STEPS_AMOUNT) * 100}%` }}
