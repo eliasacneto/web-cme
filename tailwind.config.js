@@ -21,7 +21,7 @@ module.exports = {
                 sans: ['Encode Sans Condensed', 'sans-serif'],
             },
             backgroundImage: {
-                'hero': "url('./public/assets/images/hero.png')",
+                'hero': "url('images/hero.png')",
             },
             colors: {
                 border: "hsl(var(--border))",
