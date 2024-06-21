@@ -1,7 +1,7 @@
 import { faArrowLeft, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import {
@@ -13,6 +13,7 @@ import {
 } from "./ui/select";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
+import axios from "axios";
 
 const STEPS_AMOUNT = 4;
 
@@ -49,6 +50,8 @@ interface FormValues {
   address: string;
   cep: string;
   number: string;
+  city: string;
+  state: string;
   street: string;
   neighborhood: string;
   toc: boolean;
@@ -66,6 +69,7 @@ const StepForm: React.FC = () => {
   };
 
   const {
+    setValue,
     register,
     handleSubmit,
     formState: { errors, isValid },
@@ -73,6 +77,26 @@ const StepForm: React.FC = () => {
   } = useForm<FormValues>({
     mode: "onChange",
   });
+
+  const cepValue = watch("cep");
+
+  useEffect(() => {
+    if (cepValue?.length === 8) {
+      axios
+        .get(`https://viacep.com.br/ws/${cepValue}/json/`)
+        .then((response) => {
+          const { logradouro, bairro, localidade, uf } = response.data;
+          setValue("street", logradouro);
+          setValue("neighborhood", bairro);
+          // Adicione outros campos se necessário, como cidade e estado
+          setValue("city", localidade);
+          setValue("state", uf);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar CEP:", error);
+        });
+    }
+  }, [cepValue, setValue]);
 
   const handleStepCompletion = () => {
     setFormStep((cur) => cur + 1);
@@ -289,7 +313,7 @@ const StepForm: React.FC = () => {
                     </p>
                   )}
                 </div>
-              </div>{" "}
+              </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="street" className="text-base mb-2">
@@ -330,6 +354,50 @@ const StepForm: React.FC = () => {
                   {errors.neighborhood && (
                     <p className="text-sm text-red-600 mt-2">
                       {errors.neighborhood.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col lg:flex-row lg:gap-4">
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="street" className="text-base mb-2">
+                    Cidade:
+                  </Label>
+                  <Input
+                    id="city"
+                    {...register("city", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Informe a Cidade",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.city && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.city.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="neighborhood" className="text-base mb-2">
+                    UF:
+                  </Label>
+                  <Input
+                    id="state"
+                    {...register("state", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Informe o UF",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.state && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.state.message}
                     </p>
                   )}
                 </div>
@@ -658,10 +726,10 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {/* <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
+          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>
