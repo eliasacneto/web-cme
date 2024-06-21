@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import InputMask, { ReactInputMask } from "react-input-mask";
+import InputMask from "react-input-mask";
 import {
   Select,
   SelectContent,
