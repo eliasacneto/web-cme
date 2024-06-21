@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import InputMask, { ReactInputMask } from "react-input-mask";
 import {
   Select,
   SelectContent,
@@ -81,14 +82,14 @@ const StepForm: React.FC = () => {
   const cepValue = watch("cep");
 
   useEffect(() => {
-    if (cepValue?.length === 8) {
+    const cleanedCep = cepValue?.replace(/\D/g, "");
+    if (cleanedCep?.length === 8) {
       axios
-        .get(`https://viacep.com.br/ws/${cepValue}/json/`)
+        .get(`https://viacep.com.br/ws/${cleanedCep}/json/`)
         .then((response) => {
           const { logradouro, bairro, localidade, uf } = response.data;
           setValue("street", logradouro);
           setValue("neighborhood", bairro);
-          // Adicione outros campos se necessário, como cidade e estado
           setValue("city", localidade);
           setValue("state", uf);
         })
@@ -193,7 +194,9 @@ const StepForm: React.FC = () => {
                   <Label htmlFor="hospitalContact" className="text-base mb-2">
                     Contato:
                   </Label>
-                  <Input
+                  <InputMask
+                    mask="(99) 99999-9999"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     id="hospitalContact"
                     {...register("hospitalContact", {
                       required: { message: "Preencha este campo", value: true },
@@ -236,7 +239,9 @@ const StepForm: React.FC = () => {
                   <Label htmlFor="customer" className="text-base mb-2">
                     CNPJ:
                   </Label>
-                  <Input
+                  <InputMask
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    mask="99.999.999/9999-99"
                     id="cnpj"
                     {...register("cnpj", {
                       required: { message: "Preencha este campo", value: true },
@@ -277,11 +282,13 @@ const StepForm: React.FC = () => {
                   <Label htmlFor="cep" className="text-base mb-2">
                     CEP:
                   </Label>
-                  <Input
+                  <InputMask
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    mask="99999-999"
                     id="cep"
                     {...register("cep", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: { message: "Informe um cep válido", value: 8 },
+                      minLength: { message: "Informe um cep válido", value: 9 },
                     })}
                   />
 
@@ -314,49 +321,47 @@ const StepForm: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-col lg:flex-row lg:gap-4">
-                <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="street" className="text-base mb-2">
-                    Avenida/Rua:
-                  </Label>
-                  <Input
-                    id="street"
-                    {...register("street", {
-                      required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe a rua ou avenida",
-                        value: 3,
-                      },
-                    })}
-                  />
+              <div className="flex flex-col mt-4 w-full">
+                <Label htmlFor="street" className="text-base mb-2">
+                  Avenida/Rua:
+                </Label>
+                <Input
+                  id="street"
+                  {...register("street", {
+                    required: { message: "Preencha este campo", value: true },
+                    minLength: {
+                      message: "Informe a rua ou avenida",
+                      value: 3,
+                    },
+                  })}
+                />
 
-                  {errors.street && (
-                    <p className="text-sm text-red-600 mt-2">
-                      {errors.street.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="neighborhood" className="text-base mb-2">
-                    Bairro:
-                  </Label>
-                  <Input
-                    id="neighborhood"
-                    {...register("neighborhood", {
-                      required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe o nome do Bairro",
-                        value: 3,
-                      },
-                    })}
-                  />
+                {errors.street && (
+                  <p className="text-sm text-red-600 mt-2">
+                    {errors.street.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col mt-4 w-full">
+                <Label htmlFor="neighborhood" className="text-base mb-2">
+                  Bairro:
+                </Label>
+                <Input
+                  id="neighborhood"
+                  {...register("neighborhood", {
+                    required: { message: "Preencha este campo", value: true },
+                    minLength: {
+                      message: "Informe o nome do Bairro",
+                      value: 3,
+                    },
+                  })}
+                />
 
-                  {errors.neighborhood && (
-                    <p className="text-sm text-red-600 mt-2">
-                      {errors.neighborhood.message}
-                    </p>
-                  )}
-                </div>
+                {errors.neighborhood && (
+                  <p className="text-sm text-red-600 mt-2">
+                    {errors.neighborhood.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
