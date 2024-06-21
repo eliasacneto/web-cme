@@ -557,7 +557,7 @@ const StepForm: React.FC = () => {
                   As cirurgias serão realizadas em quais dias da semana?
                 </Label>
                 <div className="flex flex-col justify-start gap-3 lg:flex-col">
-                  <div className="flex gap-3">
+                  <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox id="terms2" />
                       <label
@@ -595,7 +595,7 @@ const StepForm: React.FC = () => {
                       </label>
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox id="terms2" />
                       <label
@@ -871,61 +871,7 @@ const StepForm: React.FC = () => {
                 type="submit"
                 className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
               >
-                Gerar cálculo baseado nas informações
-              </button>
-            </section>
-          )}
-          {formStep === 4 && (
-            <section>
-              <h2 className="font-semibold text-3xl mb-8">
-                Confira o resultado!
-              </h2>
-              <p>Informações geradas baseada nos cálculos...</p>
-              <button
-                type="submit"
-                className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
-              >
-                <FontAwesomeIcon icon={faChartPie} className="mr-2" size="lg" />
-                Solicitar um relatório detalhado
-              </button>
-            </section>
-          )}
-
-          {formStep >= 3 && (
-            <section className={`${formStep === 2 ? "block" : "hidden"}`}>
-              <h2 className="font-semibold text-3xl mb-8">
-                Estamos quase lá...
-              </h2>
-              <div className="block mt-6">
-                <input
-                  {...register("toc", {
-                    required: true,
-                  })}
-                  name="toc"
-                  className="p-3 text-[#a7b928] rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
-                  type="checkbox"
-                />
-                <span>
-                  Estou ciente que posso gerar esse relatório apenas uma vez.
-                </span>
-              </div>
-              <div className="block mt-6">
-                <input
-                  {...register("pp", {
-                    required: true,
-                  })}
-                  name="pp"
-                  className="p-3 text-[#a7b928]  rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
-                  type="checkbox"
-                />
-                <span>Autorizo a Equipacare entrar em contato comigo.</span>
-              </div>
-              <button
-                disabled={!isValid}
-                type="submit"
-                className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
-              >
-                Gerar cálculo baseado nas informações
+                Conferir resultado
               </button>
             </section>
           )}
@@ -937,13 +883,14 @@ const StepForm: React.FC = () => {
               <p>Informações geradas baseada nos cálculos...</p>
               <button
                 type="submit"
-                className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
+                className="mt-6 bg-[#a7b928] text-white text-lg py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
               >
                 <FontAwesomeIcon icon={faChartPie} className="mr-2" size="lg" />
                 Solicitar um relatório detalhado
               </button>
             </section>
           )}
+
           {/* <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
