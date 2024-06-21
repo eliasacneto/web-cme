@@ -466,23 +466,23 @@ const StepForm: React.FC = () => {
                   onValueChange={handleFirstChange}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="sim" id="option-one" />
-                    <Label htmlFor="option-one">Sim</Label>
+                    <RadioGroupItem value="sim" id="sim" />
+                    <Label htmlFor="sim">Sim</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="nao" id="option-two" />
-                    <Label htmlFor="option-two">Não</Label>
+                    <RadioGroupItem value="nao" id="nao" />
+                    <Label htmlFor="não">Não</Label>
                   </div>
                 </RadioGroup>
               </div>
-              {hasClinicalEngineering === "option-one" && (
+              {hasClinicalEngineering === "sim" && (
                 <div className="flex flex-col mt-4">
                   <Label htmlFor="customer" className="text-base mb-2">
                     Como é a sua Engenharia Clínica?
                   </Label>
                   <RadioGroup defaultValue="propria" className="flex mt-2">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="propria" id="option-one" />
+                      <RadioGroupItem value="propria" id="propria" />
                       <Label htmlFor="propria">Própria</Label>
                     </div>
                     <div className="flex items-center space-x-2">
