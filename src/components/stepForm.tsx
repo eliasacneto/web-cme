@@ -15,6 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
 import axios from "axios";
+import { Checkbox } from "./ui/checkbox";
 
 const STEPS_AMOUNT = 4;
 
@@ -407,46 +408,7 @@ const StepForm: React.FC = () => {
                   )}
                 </div>
               </div>
-              {/* <div className="flex flex-col lg:flex-row lg:gap-4">
-                <div className="flex flex-col mt-4">
-                  <Label htmlFor="customer">Segmento da empresa:</Label>
-                  <Select>
-                    <SelectTrigger className="w-[250px] mt-4">
-                      <SelectValue placeholder="Selecione uma opção" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="a">Segmento A</SelectItem>
-                      <SelectItem value="b">Segmento B</SelectItem>
-                      <SelectItem value="c">Segmento C</SelectItem>
-                    </SelectContent>
-                  </Select>
 
-                  {errors.customer && (
-                    <p className="text-sm text-red-600 mt-2">
-                      {errors.customer.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-col mt-4">
-                  <Label htmlFor="customer">Cargo:</Label>
-                  <Select>
-                    <SelectTrigger className="w-[250px] mt-4">
-                      <SelectValue placeholder="Selecione uma opção" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="a">Cargo A</SelectItem>
-                      <SelectItem value="b">Cargo B</SelectItem>
-                      <SelectItem value="c">Cargo C</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {errors.customer && (
-                    <p className="text-sm text-red-600 mt-2">
-                      {errors.customer.message}
-                    </p>
-                  )}
-                </div>
-              </div> */}
               <FinishSectionButton
                 onClick={handleStepCompletion}
                 isDisabled={!isValid}
@@ -504,11 +466,11 @@ const StepForm: React.FC = () => {
                   onValueChange={handleFirstChange}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="option-one" id="option-one" />
+                    <RadioGroupItem value="sim" id="option-one" />
                     <Label htmlFor="option-one">Sim</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="option-two" id="option-two" />
+                    <RadioGroupItem value="nao" id="option-two" />
                     <Label htmlFor="option-two">Não</Label>
                   </div>
                 </RadioGroup>
@@ -516,20 +478,16 @@ const StepForm: React.FC = () => {
               {hasClinicalEngineering === "option-one" && (
                 <div className="flex flex-col mt-4">
                   <Label htmlFor="customer" className="text-base mb-2">
-                    A sua Engenharia Clínica é própria ou terceirizada?
+                    Como é a sua Engenharia Clínica?
                   </Label>
-                  <RadioGroup defaultValue="option-three" className="flex mt-2">
+                  <RadioGroup defaultValue="propria" className="flex mt-2">
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="option-three" id="option-two" />
-                      <Label htmlFor="option-three">Não se aplica</Label>
+                      <RadioGroupItem value="propria" id="option-one" />
+                      <Label htmlFor="propria">Própria</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="option-one" id="option-one" />
-                      <Label htmlFor="option-one">Sim</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="option-two" id="option-two" />
-                      <Label htmlFor="option-two">Não</Label>
+                      <RadioGroupItem value="terceirizada" id="option-two" />
+                      <Label htmlFor="terceirizada">Terceirizada</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -543,18 +501,146 @@ const StepForm: React.FC = () => {
                   id="address"
                   {...register("address", {})}
                 />
-                {/* {errors.address && (
-                  <p className="text-sm text-red-600 mt-2">
-                    {errors.address.message}
-                  </p>
-                )} */}
               </div>
-              {/* 
+
+              <FinishSectionButton
+                onClick={handleStepCompletion}
+                isDisabled={!isValid}
+              >
+                Próximo
+              </FinishSectionButton>
+            </section>
+          )}
+          {formStep >= 2 && (
+            <section className={`${formStep === 2 ? "block" : "hidden"}`}>
+              <h2 className="font-semibold text-3xl mb-8">
+                Estamos quase lá...
+              </h2>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base">
-                  Qual o intervalo de pico de funcionamento da CME em horas?
+                <Label htmlFor="customer" className="text-base mb-2">
+                  Hospital irá implantar uma nova CME ou já possui CME?
+                </Label>
+                <RadioGroup
+                  className="flex mt-2"
+                  defaultValue={hasClinicalEngineering}
+                  onValueChange={handleFirstChange}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Irei implantar" id="option-one" />
+                    <Label htmlFor="Irei implantar">Irei implantar</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Já possuo" id="option-two" />
+                    <Label htmlFor="Já possuo">Já possuo</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              {hasClinicalEngineering === "Já possuo" && (
+                <div className="flex flex-col mt-4">
+                  <Label htmlFor="customer" className="text-base mb-2">
+                    Se você já possui uma CME, o que você busca?
+                  </Label>
+                  <RadioGroup defaultValue="propria" className="flex mt-2">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="propria" id="option-one" />
+                      <Label htmlFor="propria">Quero substituir</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="terceirizada" id="option-two" />
+                      <Label htmlFor="terceirizada">Quero ampliar</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+              <div className="flex flex-col mt-4 w-full">
+                <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                  As cirurgias serão realizadas em quais dias da semana?
+                </Label>
+                <div className="flex flex-col justify-start gap-3 lg:flex-col">
+                  <div className="flex gap-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Todos os dias
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Segunda-feira
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none"
+                      >
+                        Terça-feira
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Quarta-feira
+                      </label>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Quinta-feira
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Sexta-feira
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Sábado
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox id="terms2" />
+                      <label
+                        htmlFor="terms2"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Domingo
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col mt-4">
+                <Label htmlFor="customer" className="text-base mb-2">
+                  Qual o intervalo de pico de funcionamento da CME em{" "}
+                  <strong>horas</strong>?
                   <br />{" "}
-                  <span className="text-sm text-red-500">
+                  <span className="text-sm text-[#a7b928]">
                     (período de processamento de 90% do material)
                   </span>
                 </Label>
@@ -570,23 +656,60 @@ const StepForm: React.FC = () => {
                     {errors.address.message}
                   </p>
                 )}
-              </div> */}
+              </div>
+              <div className="flex flex-col lg:flex-row lg:gap-4">
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="customer" className="text-base mb-2">
+                    Qual o tipo de processamento?
+                  </Label>
+                  <Select>
+                    <SelectTrigger className="">
+                      <SelectValue placeholder="Selecione uma opção" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Elaboração projetos">
+                        Tecidos
+                      </SelectItem>
+                      <SelectItem value="Visita técnica para avaliação diagnóstica">
+                        Apenas instrumental
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
 
-              <FinishSectionButton
-                onClick={handleStepCompletion}
-                isDisabled={!isValid}
-              >
-                Próximo
-              </FinishSectionButton>
-            </section>
-          )}
-          {formStep >= 2 && (
-            <section className={`${formStep === 2 ? "block" : "hidden"}`}>
-              <h2 className="font-semibold text-3xl mb-8">Para finalizar</h2>
+                  {errors.customer && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.customer.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                    Número de salas cirúrgicas
+                  </Label>
+                  <Input
+                    id="hospitalEmail"
+                    type="email"
+                    {...register("hospitalEmail", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Preencha com um e-mail válido!",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalEmail && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalEmail.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="hospitalEmail" className="text-base mb-2">
-                    Nº de salas cirúrgicas
+                    Número de cirurgias/sala/dia
                   </Label>
                   <Input
                     id="hospitalEmail"
@@ -608,7 +731,97 @@ const StepForm: React.FC = () => {
                 </div>
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="hospitalContact" className="text-base mb-2">
-                    Nº de cirurgias/sala/dia
+                    Número de leitos UTI
+                  </Label>
+                  <Input
+                    id="hospitalContact"
+                    {...register("hospitalContact", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Informe um número válido!",
+                        value: 10,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalContact && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalContact.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col lg:flex-row lg:gap-4">
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                    Número de leitos Internação
+                  </Label>
+                  <Input
+                    id="hospitalEmail"
+                    type="email"
+                    {...register("hospitalEmail", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Preencha com um e-mail válido!",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalEmail && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalEmail.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                    Número de leitos RPA
+                  </Label>
+                  <Input
+                    id="hospitalContact"
+                    {...register("hospitalContact", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Informe um número válido!",
+                        value: 10,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalContact && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalContact.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col lg:flex-row lg:gap-4">
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                    Número de leitos Observações
+                  </Label>
+                  <Input
+                    id="hospitalEmail"
+                    type="email"
+                    {...register("hospitalEmail", {
+                      required: { message: "Preencha este campo", value: true },
+                      minLength: {
+                        message: "Preencha com um e-mail válido!",
+                        value: 3,
+                      },
+                    })}
+                  />
+
+                  {errors.hospitalEmail && (
+                    <p className="text-sm text-red-600 mt-2">
+                      {errors.hospitalEmail.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col mt-4 w-full">
+                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                    Número de leitos Hospital Dia
                   </Label>
                   <Input
                     id="hospitalContact"
@@ -642,7 +855,7 @@ const StepForm: React.FC = () => {
                   Estou ciente que posso gerar esse relatório apenas uma vez.
                 </span>
               </div>
-              <div className="block mt-6">
+              <div className="block mt-1">
                 <input
                   {...register("pp", {
                     required: true,
@@ -716,7 +929,7 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {formStep === 4 && (
+          {formStep === 3 && (
             <section>
               <h2 className="font-semibold text-3xl mb-8">
                 Confira o resultado!
@@ -731,10 +944,10 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
+          {/* <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre>
+          </pre> */}
         </form>
       </div>
     </div>
