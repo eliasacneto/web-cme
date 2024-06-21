@@ -658,10 +658,10 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
+          {/* <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre>
+          </pre> */}
         </form>
       </div>
     </div>
