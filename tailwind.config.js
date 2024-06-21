@@ -21,7 +21,7 @@ module.exports = {
                 sans: ['Encode Sans Condensed', 'sans-serif'],
             },
             backgroundImage: {
-                'hero': "url('assets/images/hero.png')",
+                'hero': "url('images/hero.png')",
             },
             colors: {
                 border: "hsl(var(--border))",
@@ -79,5 +79,5 @@ module.exports = {
             },
         },
     },
-    plugins: [require("tailwindcss-animate")],
+    plugins: [],
 }

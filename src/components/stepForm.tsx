@@ -40,7 +40,7 @@ const FinishSectionButton: React.FC<FinishSectionButtonProps> = ({
 };
 
 interface FormValues {
-  username: string;
+  customer: string;
   hospitalName: string;
   hospitalEmail: string;
   hospitalContact: string;
@@ -123,12 +123,12 @@ const StepForm: React.FC = () => {
                 Preencha as informações
               </h2>
               <div className="flex flex-col">
-                <Label htmlFor="username" className="text-base mb-2">
+                <Label htmlFor="customer" className="text-base mb-2">
                   Nome completo:
                 </Label>
                 <Input
-                  id="username"
-                  {...register("username", {
+                  id="customer"
+                  {...register("customer", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
                       message: "Informe o seu Nome e sobrenome",
@@ -136,9 +136,9 @@ const StepForm: React.FC = () => {
                     },
                   })}
                 />
-                {errors.username && (
+                {errors.customer && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.username.message}
+                    {errors.customer.message}
                   </p>
                 )}
               </div>
@@ -209,7 +209,7 @@ const StepForm: React.FC = () => {
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="username" className="text-base mb-2">
+                  <Label htmlFor="customer" className="text-base mb-2">
                     CNPJ:
                   </Label>
                   <Input
@@ -336,7 +336,7 @@ const StepForm: React.FC = () => {
               </div>
               {/* <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4">
-                  <Label htmlFor="username">Segmento da empresa:</Label>
+                  <Label htmlFor="customer">Segmento da empresa:</Label>
                   <Select>
                     <SelectTrigger className="w-[250px] mt-4">
                       <SelectValue placeholder="Selecione uma opção" />
@@ -348,14 +348,14 @@ const StepForm: React.FC = () => {
                     </SelectContent>
                   </Select>
 
-                  {errors.username && (
+                  {errors.customer && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.customer.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4">
-                  <Label htmlFor="username">Cargo:</Label>
+                  <Label htmlFor="customer">Cargo:</Label>
                   <Select>
                     <SelectTrigger className="w-[250px] mt-4">
                       <SelectValue placeholder="Selecione uma opção" />
@@ -367,9 +367,9 @@ const StepForm: React.FC = () => {
                     </SelectContent>
                   </Select>
 
-                  {errors.username && (
+                  {errors.customer && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.username.message}
+                      {errors.customer.message}
                     </p>
                   )}
                 </div>
@@ -386,7 +386,7 @@ const StepForm: React.FC = () => {
             <section className={`${formStep === 1 ? "block" : "hidden"}`}>
               <h2 className="font-semibold text-3xl mb-8">Momento atual...</h2>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username" className="text-base mb-2">
+                <Label htmlFor="customer" className="text-base mb-2">
                   Qual o momento atual do empreendimento?
                 </Label>
                 <Select>
@@ -414,14 +414,14 @@ const StepForm: React.FC = () => {
                   </SelectContent>
                 </Select>
 
-                {errors.username && (
+                {errors.customer && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.username.message}
+                    {errors.customer.message}
                   </p>
                 )}
               </div>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username" className="text-base mb-2">
+                <Label htmlFor="customer" className="text-base mb-2">
                   Possui engenharia clínica para apoiar o processo de seleção
                   dos equipamentos?
                 </Label>
@@ -442,7 +442,7 @@ const StepForm: React.FC = () => {
               </div>
               {hasClinicalEngineering === "option-one" && (
                 <div className="flex flex-col mt-4">
-                  <Label htmlFor="username" className="text-base mb-2">
+                  <Label htmlFor="customer" className="text-base mb-2">
                     A sua Engenharia Clínica é própria ou terceirizada?
                   </Label>
                   <RadioGroup defaultValue="option-three" className="flex mt-2">
@@ -462,7 +462,7 @@ const StepForm: React.FC = () => {
                 </div>
               )}
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username" className="text-base mb-2">
+                <Label htmlFor="customer" className="text-base mb-2">
                   Do que sente mais falta no suporte da engenharia clinica?
                 </Label>
                 <Textarea
@@ -478,7 +478,7 @@ const StepForm: React.FC = () => {
               </div>
               {/* 
               <div className="flex flex-col mt-4">
-                <Label htmlFor="username" className="text-base">
+                <Label htmlFor="customer" className="text-base">
                   Qual o intervalo de pico de funcionamento da CME em horas?
                   <br />{" "}
                   <span className="text-sm text-red-500">
@@ -658,10 +658,10 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {/* <p>{isValid ? "Valid" : "Invalid"}</p>
+          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>
