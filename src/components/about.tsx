@@ -5,9 +5,9 @@ const About = () => {
     <>
       <div
         className="flex flex-col-reverse lg:flex-row items-center lg:justify-around lg:gap-0 lg:px-52 lg:py-24
-     gap-10 bg-[#161935]  py-10 px-10"
+     gap-2 bg-[#161935]  py-10 px-5"
       >
-        <div className="flex flex-col w-[60%]">
+        <div className="flex flex-col lg:w-[60%]">
           <h1 className="text-3xl text-white">
             Otimize o seu{" "}
             <u className="underline-offset-8 decoration-[#A4BA25]">
@@ -31,7 +31,7 @@ const About = () => {
             <GreenButton text="Quero saber mais" />
           </div>
         </div>
-        <div className="flex items-center justify-center w-[40%]">
+        <div className="flex items-center justify-center lg:w-[40%]">
           <img
             className="rounded-lg w-full object-contain h-96 lg:h-auto"
             src="assets/images/about.jpg"
