@@ -395,7 +395,7 @@ const StepForm: React.FC = () => {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe o UF",
-                        value: 3,
+                        value: 2,
                       },
                     })}
                   />
