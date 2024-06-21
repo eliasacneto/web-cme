@@ -30,7 +30,7 @@ const NavbarMenu = () => {
             <a
               href="#"
               target="_blank"
-              className="block  px-4 py-3 bg-transparent border border-[#A4BA25] text-[#A4BA25] text-base font-semibold uppercase rounded-md hover:text-white hover:bg-[#A4BA25] transition-all duration-500 lg:mr-4"
+              className="block  px-4 py-3 bg-transparent border border-[#A4BA25] text-[#A4BA25] text-sm md:text-base font-semibold uppercase rounded-md hover:text-white hover:bg-[#A4BA25] transition-all duration-500 lg:mr-4"
             >
               Voltar para o início
             </a>
