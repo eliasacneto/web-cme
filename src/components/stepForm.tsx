@@ -1,7 +1,7 @@
 import { faArrowLeft, faChartPie } from "@fortawesome/free-solid-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import InputMask from "react-input-mask";
@@ -56,6 +56,13 @@ interface FormValues {
   state: string;
   street: string;
   neighborhood: string;
+  numberOfSurgery: string;
+  numberSurgeryRoomDay: string;
+  numberBedUTI: string;
+  numberBedIntern: string;
+  numberBedRPA: string;
+  numberBedObs: string;
+  numberBedHospitalDay: string;
   toc: boolean;
   pp: boolean;
 }
@@ -112,6 +119,85 @@ const StepForm: React.FC = () => {
     console.log(JSON.stringify(values, null, 2));
     handleStepCompletion();
   };
+
+  interface SelectedDays {
+    allDays: boolean;
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+    saturday: boolean;
+    sunday: boolean;
+  }
+  const [isAllDaysChecked, setIsAllDaysChecked] = useState<boolean>(false);
+  const [selectedDays, setSelectedDays] = useState<SelectedDays>({
+    allDays: false,
+    monday: false,
+    tuesday: false,
+    wednesday: false,
+    thursday: false,
+    friday: false,
+    saturday: false,
+    sunday: false,
+  });
+
+  const handleAllDaysChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setIsAllDaysChecked(checked);
+    setSelectedDays({
+      allDays: checked,
+      monday: false,
+      tuesday: false,
+      wednesday: false,
+      thursday: false,
+      friday: false,
+      saturday: false,
+      sunday: false,
+    });
+  };
+
+  const handleDayChange =
+    (day: keyof SelectedDays) => (e: ChangeEvent<HTMLInputElement>) => {
+      setSelectedDays((prev) => ({
+        ...prev,
+        [day]: e.target.checked,
+      }));
+    };
+
+  interface CheckboxProps {
+    id: string;
+    checked: boolean;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    disabled?: boolean;
+  }
+
+  function Checkbox({ id, checked, onChange, disabled }: CheckboxProps) {
+    return (
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={onChange}
+        disabled={disabled}
+        className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+      />
+    );
+  }
+
+  interface LabelProps {
+    htmlFor: string;
+    children: React.ReactNode;
+    className?: string;
+  }
+
+  function Label({ htmlFor, children, className }: LabelProps) {
+    return (
+      <label htmlFor={htmlFor} className={className}>
+        {children}
+      </label>
+    );
+  }
 
   return (
     <div className=" w-full mt-10 mb-24 rounded-lg shadow-2xl bg-white overflow-hidden mx-3 z-10">
@@ -559,36 +645,55 @@ const StepForm: React.FC = () => {
                 <div className="flex flex-col justify-start gap-3 lg:flex-col">
                   <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="allDays"
+                        checked={selectedDays.allDays}
+                        onChange={handleAllDaysChange}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="allDays"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Todos os dias
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="monday"
+                        checked={selectedDays.monday}
+                        onChange={handleDayChange("monday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="monday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Segunda-feira
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="tuesday"
+                        checked={selectedDays.tuesday}
+                        onChange={handleDayChange("tuesday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="tuesday"
                         className="text-sm font-medium leading-none"
                       >
                         Terça-feira
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="wednesday"
+                        checked={selectedDays.wednesday}
+                        onChange={handleDayChange("wednesday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="wednesday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Quarta-feira
@@ -597,36 +702,56 @@ const StepForm: React.FC = () => {
                   </div>
                   <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="thursday"
+                        checked={selectedDays.thursday}
+                        onChange={handleDayChange("thursday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="thursday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Quinta-feira
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="friday"
+                        checked={selectedDays.friday}
+                        onChange={handleDayChange("friday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="friday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Sexta-feira
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="saturday"
+                        checked={selectedDays.saturday}
+                        onChange={handleDayChange("saturday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="saturday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Sábado
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="terms2" />
+                      <Checkbox
+                        id="sunday"
+                        checked={selectedDays.sunday}
+                        onChange={handleDayChange("sunday")}
+                        disabled={isAllDaysChecked}
+                      />
                       <label
-                        htmlFor="terms2"
+                        htmlFor="sunday"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Domingo
@@ -683,165 +808,141 @@ const StepForm: React.FC = () => {
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                  <Label htmlFor="numberOfSurgery" className="text-base mb-2">
                     Número de salas cirúrgicas
                   </Label>
                   <Input
-                    id="hospitalEmail"
-                    type="email"
-                    {...register("hospitalEmail", {
+                    id="numberOfSurgery"
+                    type="text"
+                    {...register("numberOfSurgery", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Preencha com um e-mail válido!",
-                        value: 3,
-                      },
                     })}
                   />
 
-                  {errors.hospitalEmail && (
+                  {errors.numberOfSurgery && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalEmail.message}
+                      {errors.numberOfSurgery.message}
                     </p>
                   )}
                 </div>
               </div>
-
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                  <Label
+                    htmlFor="numberSurgeryRoomDay"
+                    className="text-base mb-2"
+                  >
                     Número de cirurgias/sala/dia
                   </Label>
                   <Input
-                    id="hospitalEmail"
-                    type="email"
-                    {...register("hospitalEmail", {
+                    id="numberSurgeryRoomDay"
+                    type="text"
+                    {...register("numberSurgeryRoomDay", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Preencha com um e-mail válido!",
-                        value: 3,
-                      },
                     })}
                   />
 
-                  {errors.hospitalEmail && (
+                  {errors.numberSurgeryRoomDay && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalEmail.message}
+                      {errors.numberSurgeryRoomDay.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                  <Label htmlFor="numberBedUTI" className="text-base mb-2">
                     Número de leitos UTI
                   </Label>
                   <Input
-                    id="hospitalContact"
-                    {...register("hospitalContact", {
+                    id="numberBedUTI"
+                    {...register("numberBedUTI", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe um número válido!",
-                        value: 10,
-                      },
                     })}
                   />
 
-                  {errors.hospitalContact && (
+                  {errors.numberBedUTI && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalContact.message}
+                      {errors.numberBedUTI.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                  <Label htmlFor="numberBedIntern" className="text-base mb-2">
                     Número de leitos Internação
                   </Label>
                   <Input
-                    id="hospitalEmail"
-                    type="email"
-                    {...register("hospitalEmail", {
+                    id="numberBedIntern"
+                    type="text"
+                    {...register("numberBedIntern", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Preencha com um e-mail válido!",
-                        value: 3,
-                      },
                     })}
                   />
 
-                  {errors.hospitalEmail && (
+                  {errors.numberBedIntern && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalEmail.message}
+                      {errors.numberBedIntern.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                  <Label htmlFor="numberBedRPA" className="text-base mb-2">
                     Número de leitos RPA
                   </Label>
                   <Input
-                    id="hospitalContact"
-                    {...register("hospitalContact", {
+                    id="numberBedRPA"
+                    {...register("numberBedRPA", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe um número válido!",
-                        value: 10,
-                      },
                     })}
                   />
 
-                  {errors.hospitalContact && (
+                  {errors.numberBedRPA && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalContact.message}
+                      {errors.numberBedRPA.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                  <Label htmlFor="numberBedObs" className="text-base mb-2">
                     Número de leitos Observações
                   </Label>
                   <Input
-                    id="hospitalEmail"
-                    type="email"
-                    {...register("hospitalEmail", {
+                    id="numberBedObs"
+                    type="text"
+                    {...register("numberBedObs", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Preencha com um e-mail válido!",
-                        value: 3,
-                      },
                     })}
                   />
 
-                  {errors.hospitalEmail && (
+                  {errors.numberBedObs && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalEmail.message}
+                      {errors.numberBedObs.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="hospitalContact" className="text-base mb-2">
+                  <Label
+                    htmlFor="numberBedHospitalDay"
+                    className="text-base mb-2"
+                  >
                     Número de leitos Hospital Dia
                   </Label>
                   <Input
-                    id="hospitalContact"
-                    {...register("hospitalContact", {
+                    id="numberBedHospitalDay"
+                    {...register("numberBedHospitalDay", {
                       required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe um número válido!",
-                        value: 10,
-                      },
                     })}
                   />
 
-                  {errors.hospitalContact && (
+                  {errors.numberBedHospitalDay && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalContact.message}
+                      {errors.numberBedHospitalDay.message}
                     </p>
                   )}
                 </div>
               </div>
-
               <div className="block mt-6">
                 <input
                   {...register("toc", {
