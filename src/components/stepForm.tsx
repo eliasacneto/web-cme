@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+
 import InputMask from "react-input-mask";
 import {
   Select,
@@ -15,7 +15,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
 import axios from "axios";
-import { Checkbox } from "./ui/checkbox";
 
 const STEPS_AMOUNT = 4;
 
@@ -49,13 +48,12 @@ interface FormValues {
   hospitalContact: string;
   cnpj: string;
   role: string;
-  address: string;
   cep: string;
   number: string;
-  city: string;
-  state: string;
   street: string;
   neighborhood: string;
+  city: string;
+  state: string;
   numberOfSurgery: string;
   numberSurgeryRoomDay: string;
   numberBedUTI: string;
@@ -63,12 +61,16 @@ interface FormValues {
   numberBedRPA: string;
   numberBedObs: string;
   numberBedHospitalDay: string;
-  toc: boolean;
-  pp: boolean;
+  acceptOneReport: string;
+  acceptContact: string;
+  needing: string;
+  intervalCMEHour: string;
+  businessMoment: string;
 }
 
 const StepForm: React.FC = () => {
   const [formStep, setFormStep] = React.useState<number>(0);
+  const [id, setId] = useState(1);
 
   const [hasClinicalEngineering, setHasClinicalEngineering] =
     useState<string>("option-two");
@@ -79,7 +81,9 @@ const StepForm: React.FC = () => {
 
   const {
     setValue,
+
     register,
+
     handleSubmit,
     formState: { errors, isValid },
     watch,
@@ -115,8 +119,21 @@ const StepForm: React.FC = () => {
     setFormStep((cur) => cur - 1);
   };
 
-  const onSubmit: SubmitHandler<FormValues> = (values) => {
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    const valuesWithId = { id, ...values };
     console.log(JSON.stringify(values, null, 2));
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/lead",
+        valuesWithId
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Erro ao enviar os dados para a API", error);
+    }
+    setId((prevId) => prevId + 1);
+
     handleStepCompletion();
   };
 
@@ -507,11 +524,11 @@ const StepForm: React.FC = () => {
             <section className={`${formStep === 1 ? "block" : "hidden"}`}>
               <h2 className="font-semibold text-3xl mb-8">Momento atual...</h2>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base mb-2">
+                <Label htmlFor="businessMoment" className="text-base mb-2">
                   Qual o momento atual do empreendimento?
                 </Label>
                 <Select>
-                  <SelectTrigger className="">
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecione uma opção" />
                   </SelectTrigger>
                   <SelectContent>
@@ -535,9 +552,9 @@ const StepForm: React.FC = () => {
                   </SelectContent>
                 </Select>
 
-                {errors.customer && (
+                {errors.businessMoment && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.customer.message}
+                    {errors.businessMoment.message}
                   </p>
                 )}
               </div>
@@ -584,8 +601,8 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Textarea
                   placeholder="Escreva aqui..."
-                  id="address"
-                  {...register("address", {})}
+                  id="needing"
+                  {...register("needing", {})}
                 />
               </div>
 
@@ -770,15 +787,15 @@ const StepForm: React.FC = () => {
                   </span>
                 </Label>
                 <Input
-                  id="address"
+                  id="intervalCMEHour"
                   placeholder="Ex.: 12"
-                  {...register("address", {
+                  {...register("intervalCMEHour", {
                     required: { message: "Preencha este campo", value: true },
                   })}
                 />
-                {errors.address && (
+                {errors.intervalCMEHour && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.address.message}
+                    {errors.intervalCMEHour.message}
                   </p>
                 )}
               </div>
@@ -945,10 +962,10 @@ const StepForm: React.FC = () => {
               </div>
               <div className="block mt-6">
                 <input
-                  {...register("toc", {
+                  {...register("acceptOneReport", {
                     required: true,
                   })}
-                  name="toc"
+                  name="acceptOneReport"
                   className="p-3 text-[#a7b928] rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
                   type="checkbox"
                 />
@@ -958,10 +975,10 @@ const StepForm: React.FC = () => {
               </div>
               <div className="block mt-1">
                 <input
-                  {...register("pp", {
+                  {...register("acceptContact", {
                     required: true,
                   })}
-                  name="pp"
+                  name="acceptContact"
                   className="p-3 text-[#a7b928]  rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
                   type="checkbox"
                 />
@@ -983,7 +1000,7 @@ const StepForm: React.FC = () => {
               </h2>
               <p>Informações geradas baseada nos cálculos...</p>
               <button
-                type="submit"
+                onClick={() => alert("Mostra um dialog legal aqui")}
                 className="mt-6 bg-[#a7b928] text-white text-lg py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
               >
                 <FontAwesomeIcon icon={faChartPie} className="mr-2" size="lg" />
