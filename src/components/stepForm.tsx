@@ -392,7 +392,8 @@ const StepForm: React.FC = () => {
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="customer" className="text-base mb-2">
-                    CNPJ:
+                    CNPJ:{" "}
+                    <span className="text-sm text-[#a7b928]">(opcional)</span>
                   </Label>
                   <InputMask
                     className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
