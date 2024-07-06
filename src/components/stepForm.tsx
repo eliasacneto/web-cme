@@ -41,6 +41,17 @@ const FinishSectionButton: React.FC<FinishSectionButtonProps> = ({
   );
 };
 
+interface SelectedDays {
+  todosDias: boolean;
+  segunda: boolean;
+  terca: boolean;
+  quarta: boolean;
+  quinta: boolean;
+  sexta: boolean;
+  sabado: boolean;
+  domingo: boolean;
+}
+
 interface FormValues {
   nomeLead: string;
   hospitalNome: string;
@@ -49,7 +60,7 @@ interface FormValues {
   cnpj: string;
   cargo: string;
   cep: string;
-  number: string;
+  numero: string;
   rua: string;
   bairro: string;
   cidade: string;
@@ -67,9 +78,10 @@ interface FormValues {
   obsEngenhariaClinica: string;
   precisaCME: string;
   busco: string;
-
+  diaSemanaCirurgia: string[];
   tipoProcessamento: string;
-  intervalCMEHour: string;
+  intervaloPicoCME: string;
+
   acceptOneReport: string;
   acceptContact: string;
 }
@@ -82,9 +94,67 @@ const StepForm: React.FC = () => {
     useState<string>("nao");
   const [typeClinicalEngineering, setTypeClinicalEngineering] =
     useState<string>("propria");
+
   const [hasCME, setHasCME] = useState<string>("irei-implantar");
 
   const [seekCME, setSeekCME] = useState<string>("quero-substituir");
+
+  const [isAllDaysChecked, setIsAllDaysChecked] = useState<boolean>(false);
+  const [selectedDays, setSelectedDays] = useState<SelectedDays>({
+    todosDias: false,
+    segunda: false,
+    terca: false,
+    quarta: false,
+    quinta: false,
+    sexta: false,
+    sabado: false,
+    domingo: false,
+  });
+
+  const updateDiaSemanaCirurgia = (newSelectedDays: SelectedDays) => {
+    let days: string[];
+    if (newSelectedDays.todosDias) {
+      days = ["todosDias"];
+    } else {
+      days = Object.keys(newSelectedDays).filter(
+        (day) =>
+          day !== "todosDias" && newSelectedDays[day as keyof SelectedDays]
+      );
+    }
+    setValue("diaSemanaCirurgia", days);
+  };
+
+  const handleAllDaysChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setIsAllDaysChecked(checked);
+    const newSelectedDays = {
+      todosDias: checked,
+      segunda: checked,
+      terca: checked,
+      quarta: checked,
+      quinta: checked,
+      sexta: checked,
+      sabado: checked,
+      domingo: checked,
+    };
+    setSelectedDays(newSelectedDays);
+    updateDiaSemanaCirurgia(newSelectedDays);
+  };
+
+  const handleDayChange =
+    (day: keyof SelectedDays) => (e: ChangeEvent<HTMLInputElement>) => {
+      const newSelectedDays = {
+        ...selectedDays,
+        [day]: e.target.checked,
+        todosDias: false, // Uncheck "todosDias" if individual days are being checked
+      };
+      setSelectedDays(newSelectedDays);
+      updateDiaSemanaCirurgia(newSelectedDays);
+    };
+  //   const handleWeekDaySurgeryChange = (value: SelectedDays) => {
+  //     setSelectedDays(value);
+  //     setValue("diaSemanaCirurgia", value);
+  //   };
 
   //   const handleFirstChange = (value: string) => {
   //     setHasClinicalEngineering(value);
@@ -168,51 +238,6 @@ const StepForm: React.FC = () => {
 
     handleStepCompletion();
   };
-
-  interface SelectedDays {
-    allDays: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-    sunday: boolean;
-  }
-  const [isAllDaysChecked, setIsAllDaysChecked] = useState<boolean>(false);
-  const [selectedDays, setSelectedDays] = useState<SelectedDays>({
-    allDays: false,
-    monday: false,
-    tuesday: false,
-    wednesday: false,
-    thursday: false,
-    friday: false,
-    saturday: false,
-    sunday: false,
-  });
-
-  const handleAllDaysChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setIsAllDaysChecked(checked);
-    setSelectedDays({
-      allDays: checked,
-      monday: false,
-      tuesday: false,
-      wednesday: false,
-      thursday: false,
-      friday: false,
-      saturday: false,
-      sunday: false,
-    });
-  };
-
-  const handleDayChange =
-    (day: keyof SelectedDays) => (e: ChangeEvent<HTMLInputElement>) => {
-      setSelectedDays((prev) => ({
-        ...prev,
-        [day]: e.target.checked,
-      }));
-    };
 
   interface CheckboxProps {
     id: string;
@@ -436,12 +461,12 @@ const StepForm: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="number" className="text-base mb-2">
+                  <Label htmlFor="numero" className="text-base mb-2">
                     Número:
                   </Label>
                   <Input
-                    id="number"
-                    {...register("number", {
+                    id="numero"
+                    {...register("numero", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe um número válido",
@@ -450,9 +475,9 @@ const StepForm: React.FC = () => {
                     })}
                   />
 
-                  {errors.number && (
+                  {errors.numero && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.number.message}
+                      {errors.numero.message}
                     </p>
                   )}
                 </div>
@@ -724,19 +749,19 @@ const StepForm: React.FC = () => {
                 </div>
               )}
               <div className="flex flex-col mt-4 w-full">
-                <Label htmlFor="hospitalEmail" className="text-base mb-2">
+                <Label htmlFor="diaSemanaCirurgia" className="text-base mb-2">
                   As cirurgias serão realizadas em quais dias da semana?
                 </Label>
                 <div className="flex flex-col justify-start gap-3 lg:flex-col">
                   <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="allDays"
-                        checked={selectedDays.allDays}
+                        id="todosDias"
+                        checked={selectedDays.todosDias}
                         onChange={handleAllDaysChange}
                       />
                       <label
-                        htmlFor="allDays"
+                        htmlFor="todosDias"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Todos os dias
@@ -744,13 +769,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="monday"
-                        checked={selectedDays.monday}
-                        onChange={handleDayChange("monday")}
+                        id="segunda"
+                        checked={selectedDays.segunda}
+                        onChange={handleDayChange("segunda")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="monday"
+                        htmlFor="segunda"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Segunda-feira
@@ -758,13 +783,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="tuesday"
-                        checked={selectedDays.tuesday}
-                        onChange={handleDayChange("tuesday")}
+                        id="terca"
+                        checked={selectedDays.terca}
+                        onChange={handleDayChange("terca")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="tuesday"
+                        htmlFor="terca"
                         className="text-sm font-medium leading-none"
                       >
                         Terça-feira
@@ -772,13 +797,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="wednesday"
-                        checked={selectedDays.wednesday}
-                        onChange={handleDayChange("wednesday")}
+                        id="quarta"
+                        checked={selectedDays.quarta}
+                        onChange={handleDayChange("quarta")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="wednesday"
+                        htmlFor="quarta"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Quarta-feira
@@ -788,13 +813,13 @@ const StepForm: React.FC = () => {
                   <div className="flex flex-col lg:flex-row gap-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="thursday"
-                        checked={selectedDays.thursday}
-                        onChange={handleDayChange("thursday")}
+                        id="quinta"
+                        checked={selectedDays.quinta}
+                        onChange={handleDayChange("quinta")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="thursday"
+                        htmlFor="quinta"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Quinta-feira
@@ -802,13 +827,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="friday"
-                        checked={selectedDays.friday}
-                        onChange={handleDayChange("friday")}
+                        id="sexta"
+                        checked={selectedDays.sexta}
+                        onChange={handleDayChange("sexta")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="friday"
+                        htmlFor="sexta"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Sexta-feira
@@ -816,13 +841,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="saturday"
-                        checked={selectedDays.saturday}
-                        onChange={handleDayChange("saturday")}
+                        id="sabado"
+                        checked={selectedDays.sabado}
+                        onChange={handleDayChange("sabado")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="saturday"
+                        htmlFor="sabado"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Sábado
@@ -830,13 +855,13 @@ const StepForm: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="sunday"
-                        checked={selectedDays.sunday}
-                        onChange={handleDayChange("sunday")}
+                        id="domingo"
+                        checked={selectedDays.domingo}
+                        onChange={handleDayChange("domingo")}
                         disabled={isAllDaysChecked}
                       />
                       <label
-                        htmlFor="sunday"
+                        htmlFor="domingo"
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         Domingo
@@ -846,7 +871,7 @@ const StepForm: React.FC = () => {
                 </div>
               </div>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base mb-2">
+                <Label htmlFor="intervaloPicoCME" className="text-base mb-2">
                   Qual o intervalo de pico de funcionamento da CME em{" "}
                   <strong>horas</strong>?
                   <br />{" "}
@@ -855,15 +880,14 @@ const StepForm: React.FC = () => {
                   </span>
                 </Label>
                 <Input
-                  id="intervalCMEHour"
-                  placeholder="Ex.: 12"
-                  {...register("intervalCMEHour", {
+                  id="intervaloPicoCME"
+                  {...register("intervaloPicoCME", {
                     required: { message: "Preencha este campo", value: true },
                   })}
                 />
-                {errors.intervalCMEHour && (
+                {errors.intervaloPicoCME && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.intervalCMEHour.message}
+                    {errors.intervaloPicoCME.message}
                   </p>
                 )}
               </div>
