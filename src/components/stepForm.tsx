@@ -1084,18 +1084,6 @@ const StepForm: React.FC = () => {
                   contato da Equipacare.
                 </span>
               </div>
-
-              {/* <div className="block mt-1">
-                <input
-                  {...register("aceitarContato", {
-                    required: true,
-                  })}
-                  name="aceitarContato"
-                  className="p-3 text-[#a7b928]  rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
-                  type="checkbox"
-                />
-                <span>Autorizo a Equipacare entrar em contato comigo.</span>
-              </div> */}
               <button
                 disabled={!isValid}
                 type="submit"
