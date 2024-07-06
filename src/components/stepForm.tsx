@@ -65,13 +65,13 @@ interface FormValues {
   bairro: string;
   cidade: string;
   estado: string;
-  numeroSalasCirurgias: string;
-  numeroCirurgiaSalaDia: string;
-  numeroLeitoUTI: string;
-  numeroLeitoInternacao: string;
-  numeroLeitoRPA: string;
-  numeroLeitoObs: string;
-  numeroLeitoHospitalDia: string;
+  numeroSalasCirurgias: number;
+  numeroCirurgiaSalaDia: number;
+  numeroLeitoUTI: number;
+  numeroLeitoInternacao: number;
+  numeroLeitoRPA: number;
+  numeroLeitoObs: number;
+  numeroLeitoHospitalDia: number;
   momentoAtualEmpreendimento: string;
   possuiEngenhariaClinica: string;
   tipoEngenhariaClinica: string;
@@ -79,11 +79,9 @@ interface FormValues {
   precisaCME: string;
   busco: string;
   diaSemanaCirurgia: string[];
-  tipoProcessamento: string;
   intervaloPicoCME: string;
-
-  acceptOneReport: string;
-  acceptContact: string;
+  tipoProcessamento: string;
+  aceitarTermos: string;
 }
 
 const StepForm: React.FC = () => {
@@ -151,14 +149,6 @@ const StepForm: React.FC = () => {
       setSelectedDays(newSelectedDays);
       updateDiaSemanaCirurgia(newSelectedDays);
     };
-  //   const handleWeekDaySurgeryChange = (value: SelectedDays) => {
-  //     setSelectedDays(value);
-  //     setValue("diaSemanaCirurgia", value);
-  //   };
-
-  //   const handleFirstChange = (value: string) => {
-  //     setHasClinicalEngineering(value);
-  //   };
 
   const {
     setValue,
@@ -194,6 +184,10 @@ const StepForm: React.FC = () => {
     setValue("busco", value);
   };
 
+  const handleProcessTypeChange = (value: string) => {
+    setValue("tipoProcessamento", value);
+  };
+
   useEffect(() => {
     const cleanedCep = cepValue?.replace(/\D/g, "");
     if (cleanedCep?.length === 8) {
@@ -225,15 +219,15 @@ const StepForm: React.FC = () => {
     const valuesWithId = { id, ...values };
     console.log(JSON.stringify(values, null, 2));
 
-    // try {
-    //   const response = await axios.post(
-    //     "http://localhost:8000/lead",
-    //     valuesWithId
-    //   );
-    //   console.log(response.data);
-    // } catch (error) {
-    //   console.error("Erro ao enviar os dados para a API", error);
-    // }
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/lead",
+        valuesWithId
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Erro ao enviar os dados para a API", error);
+    }
     setId((prevId) => prevId + 1);
 
     handleStepCompletion();
@@ -254,7 +248,7 @@ const StepForm: React.FC = () => {
         checked={checked}
         onChange={onChange}
         disabled={disabled}
-        className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+        className="form-checkbox h-4 w-4 checked:bg-[#A4BA25] text-white transition duration-150 ease-in-out"
       />
     );
   }
@@ -404,20 +398,7 @@ const StepForm: React.FC = () => {
                     className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     mask="99.999.999/9999-99"
                     id="cnpj"
-                    // {...register("cnpj", {
-                    //   required: { message: "Preencha este campo", value: true },
-                    //   minLength: {
-                    //     message: "Informe um documento válido",
-                    //     value: 14,
-                    //   },
-                    // })}
                   />
-
-                  {/* {errors.cnpj && (
-                    <p className="text-sm text-red-600 mt-2">
-                      {errors.cnpj.message}
-                    </p>
-                  )} */}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="role" className="text-base mb-2">
@@ -881,8 +862,12 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Input
                   id="intervaloPicoCME"
+                  type="number"
                   {...register("intervaloPicoCME", {
-                    required: { message: "Preencha este campo", value: true },
+                    required: {
+                      message: "Preencha este campo em horas",
+                      value: true,
+                    },
                   })}
                 />
                 {errors.intervaloPicoCME && (
@@ -896,15 +881,18 @@ const StepForm: React.FC = () => {
                   <Label htmlFor="tipoProcessamento" className="text-base mb-2">
                     Qual o tipo de processamento?
                   </Label>
-                  <Select>
+                  <Select
+                    onValueChange={handleProcessTypeChange}
+                    {...register("tipoProcessamento", {
+                      required: { message: "Selecione uma opção", value: true },
+                    })}
+                  >
                     <SelectTrigger className="">
                       <SelectValue placeholder="Selecione uma opção" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Elaboração projetos">
-                        Tecidos
-                      </SelectItem>
-                      <SelectItem value="Visita técnica para avaliação diagnóstica">
+                      <SelectItem value="Tecidos">Tecidos</SelectItem>
+                      <SelectItem value="Apenas instrumental">
                         Apenas instrumental
                       </SelectItem>
                     </SelectContent>
@@ -925,9 +913,12 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroSalasCirurgias"
-                    type="text"
+                    type="number"
                     {...register("numeroSalasCirurgias", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -948,9 +939,12 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroCirurgiaSalaDia"
-                    type="text"
+                    type="number"
                     {...register("numeroCirurgiaSalaDia", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -965,9 +959,13 @@ const StepForm: React.FC = () => {
                     Número de leitos UTI
                   </Label>
                   <Input
+                    type="number"
                     id="numeroLeitoUTI"
                     {...register("numeroLeitoUTI", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -988,9 +986,12 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroLeitoInternacao"
-                    type="text"
+                    type="number"
                     {...register("numeroLeitoInternacao", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -1005,9 +1006,13 @@ const StepForm: React.FC = () => {
                     Número de leitos RPA
                   </Label>
                   <Input
+                    type="number"
                     id="numeroLeitoRPA"
                     {...register("numeroLeitoRPA", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -1025,9 +1030,12 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroLeitoObs"
-                    type="text"
+                    type="number"
                     {...register("numeroLeitoObs", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -1045,9 +1053,13 @@ const StepForm: React.FC = () => {
                     Número de leitos Hospital Dia
                   </Label>
                   <Input
+                    type="number"
                     id="numeroLeitoHospitalDia"
                     {...register("numeroLeitoHospitalDia", {
-                      required: { message: "Preencha este campo", value: true },
+                      required: {
+                        message: "Preencha com a quantidade",
+                        value: true,
+                      },
                     })}
                   />
 
@@ -1058,30 +1070,32 @@ const StepForm: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="block mt-6">
+              <div className=" mt-6 flex items-center">
                 <input
-                  {...register("acceptOneReport", {
+                  {...register("aceitarTermos", {
                     required: true,
                   })}
-                  name="acceptOneReport"
-                  className="p-3 text-[#a7b928] rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
+                  name="aceitarTermos"
+                  className="p-3 text-[#a7b928] rounded mr-3  border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
                   type="checkbox"
                 />
-                <span>
-                  Estou ciente que posso gerar esse relatório apenas uma vez.
+                <span className="text-sm ">
+                  Concordo em gerar o relatório apenas uma vez e autorizo o
+                  contato da Equipacare.
                 </span>
               </div>
-              <div className="block mt-1">
+
+              {/* <div className="block mt-1">
                 <input
-                  {...register("acceptContact", {
+                  {...register("aceitarContato", {
                     required: true,
                   })}
-                  name="acceptContact"
+                  name="aceitarContato"
                   className="p-3 text-[#a7b928]  rounded mr-3 border-2 border-gray-300 ring-0 focus:ring-0 focus:ring-offset-0 focus:border-0 cursor-pointer"
                   type="checkbox"
                 />
                 <span>Autorizo a Equipacare entrar em contato comigo.</span>
-              </div>
+              </div> */}
               <button
                 disabled={!isValid}
                 type="submit"
@@ -1107,10 +1121,10 @@ const StepForm: React.FC = () => {
             </section>
           )}
 
-          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
+          {/* <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre>
+          </pre> */}
         </form>
       </div>
     </div>
