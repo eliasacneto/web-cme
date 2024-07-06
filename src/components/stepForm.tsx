@@ -42,30 +42,36 @@ const FinishSectionButton: React.FC<FinishSectionButtonProps> = ({
 };
 
 interface FormValues {
-  customer: string;
-  hospitalName: string;
+  nomeLead: string;
+  hospitalNome: string;
   hospitalEmail: string;
-  hospitalContact: string;
+  hospitalContato: string;
   cnpj: string;
-  role: string;
+  cargo: string;
   cep: string;
   number: string;
-  street: string;
-  neighborhood: string;
-  city: string;
-  state: string;
-  numberOfSurgery: string;
-  numberSurgeryRoomDay: string;
-  numberBedUTI: string;
-  numberBedIntern: string;
-  numberBedRPA: string;
-  numberBedObs: string;
-  numberBedHospitalDay: string;
+  rua: string;
+  bairro: string;
+  cidade: string;
+  estado: string;
+  numeroSalasCirurgias: string;
+  numeroCirurgiaSalaDia: string;
+  numeroLeitoUTI: string;
+  numeroLeitoInternacao: string;
+  numeroLeitoRPA: string;
+  numeroLeitoObs: string;
+  numeroLeitoHospitalDia: string;
+  momentoAtualEmpreendimento: string;
+  possuiEngenhariaClinica: string;
+  tipoEngenhariaClinica: string;
+  obsEngenhariaClinica: string;
+  precisaCME: string;
+  busco: string;
+
+  tipoProcessamento: string;
+  intervalCMEHour: string;
   acceptOneReport: string;
   acceptContact: string;
-  needing: string;
-  intervalCMEHour: string;
-  businessMoment: string;
 }
 
 const StepForm: React.FC = () => {
@@ -73,17 +79,20 @@ const StepForm: React.FC = () => {
   const [id, setId] = useState(1);
 
   const [hasClinicalEngineering, setHasClinicalEngineering] =
-    useState<string>("option-two");
+    useState<string>("nao");
+  const [typeClinicalEngineering, setTypeClinicalEngineering] =
+    useState<string>("propria");
+  const [hasCME, setHasCME] = useState<string>("irei-implantar");
 
-  const handleFirstChange = (value: string) => {
-    setHasClinicalEngineering(value);
-  };
+  const [seekCME, setSeekCME] = useState<string>("quero-substituir");
+
+  //   const handleFirstChange = (value: string) => {
+  //     setHasClinicalEngineering(value);
+  //   };
 
   const {
     setValue,
-
     register,
-
     handleSubmit,
     formState: { errors, isValid },
     watch,
@@ -93,6 +102,28 @@ const StepForm: React.FC = () => {
 
   const cepValue = watch("cep");
 
+  const handleBusinessMomentChange = (value: string) => {
+    setValue("momentoAtualEmpreendimento", value);
+  };
+  const handleHasClinicalEngineeringChange = (value: string) => {
+    setHasClinicalEngineering(value);
+    setValue("possuiEngenhariaClinica", value);
+  };
+  const handleTypeClinicalEngineeringChange = (value: string) => {
+    setTypeClinicalEngineering(value);
+    setValue("tipoEngenhariaClinica", value);
+  };
+
+  const handleHasCMEChange = (value: string) => {
+    setHasCME(value);
+    setValue("precisaCME", value);
+  };
+
+  const handleSeekCMEChange = (value: string) => {
+    setSeekCME(value);
+    setValue("busco", value);
+  };
+
   useEffect(() => {
     const cleanedCep = cepValue?.replace(/\D/g, "");
     if (cleanedCep?.length === 8) {
@@ -100,10 +131,10 @@ const StepForm: React.FC = () => {
         .get(`https://viacep.com.br/ws/${cleanedCep}/json/`)
         .then((response) => {
           const { logradouro, bairro, localidade, uf } = response.data;
-          setValue("street", logradouro);
-          setValue("neighborhood", bairro);
-          setValue("city", localidade);
-          setValue("state", uf);
+          setValue("rua", logradouro);
+          setValue("bairro", bairro);
+          setValue("cidade", localidade);
+          setValue("estado", uf);
         })
         .catch((error) => {
           console.error("Erro ao buscar CEP:", error);
@@ -113,6 +144,7 @@ const StepForm: React.FC = () => {
 
   const handleStepCompletion = () => {
     setFormStep((cur) => cur + 1);
+    // alert("Acabou!");
   };
 
   const handleGoBackToPreviousStep = () => {
@@ -123,15 +155,15 @@ const StepForm: React.FC = () => {
     const valuesWithId = { id, ...values };
     console.log(JSON.stringify(values, null, 2));
 
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/lead",
-        valuesWithId
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Erro ao enviar os dados para a API", error);
-    }
+    // try {
+    //   const response = await axios.post(
+    //     "http://localhost:8000/lead",
+    //     valuesWithId
+    //   );
+    //   console.log(response.data);
+    // } catch (error) {
+    //   console.error("Erro ao enviar os dados para a API", error);
+    // }
     setId((prevId) => prevId + 1);
 
     handleStepCompletion();
@@ -256,8 +288,8 @@ const StepForm: React.FC = () => {
                   Nome completo:
                 </Label>
                 <Input
-                  id="customer"
-                  {...register("customer", {
+                  id="nomeLead"
+                  {...register("nomeLead", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
                       message: "Informe o seu Nome e sobrenome",
@@ -265,9 +297,9 @@ const StepForm: React.FC = () => {
                     },
                   })}
                 />
-                {errors.customer && (
+                {errors.nomeLead && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.customer.message}
+                    {errors.nomeLead.message}
                   </p>
                 )}
               </div>
@@ -301,8 +333,8 @@ const StepForm: React.FC = () => {
                   <InputMask
                     mask="(99) 99999-9999"
                     className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    id="hospitalContact"
-                    {...register("hospitalContact", {
+                    id="hospitalContato"
+                    {...register("hospitalContato", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe um número válido!",
@@ -311,9 +343,9 @@ const StepForm: React.FC = () => {
                     })}
                   />
 
-                  {errors.hospitalContact && (
+                  {errors.hospitalContato && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.hospitalContact.message}
+                      {errors.hospitalContato.message}
                     </p>
                   )}
                 </div>
@@ -323,8 +355,8 @@ const StepForm: React.FC = () => {
                   Nome do hospital:
                 </Label>
                 <Input
-                  id="hospitalName"
-                  {...register("hospitalName", {
+                  id="hospitalNome"
+                  {...register("hospitalNome", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
                       message: "Preencha com o nome do hospital",
@@ -332,9 +364,9 @@ const StepForm: React.FC = () => {
                     },
                   })}
                 />
-                {errors.hospitalName && (
+                {errors.hospitalNome && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.hospitalName.message}
+                    {errors.hospitalNome.message}
                   </p>
                 )}
               </div>
@@ -347,36 +379,36 @@ const StepForm: React.FC = () => {
                     className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     mask="99.999.999/9999-99"
                     id="cnpj"
-                    {...register("cnpj", {
-                      required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Informe um documento válido",
-                        value: 14,
-                      },
-                    })}
+                    // {...register("cnpj", {
+                    //   required: { message: "Preencha este campo", value: true },
+                    //   minLength: {
+                    //     message: "Informe um documento válido",
+                    //     value: 14,
+                    //   },
+                    // })}
                   />
 
-                  {errors.cnpj && (
+                  {/* {errors.cnpj && (
                     <p className="text-sm text-red-600 mt-2">
                       {errors.cnpj.message}
                     </p>
-                  )}
+                  )} */}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="role" className="text-base mb-2">
                     Seu cargo atual:
                   </Label>
                   <Input
-                    id="role"
-                    {...register("role", {
+                    id="cargo"
+                    {...register("cargo", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: { message: "Informe um cargo", value: 3 },
                     })}
                   />
 
-                  {errors.role && (
+                  {errors.cargo && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.role.message}
+                      {errors.cargo.message}
                     </p>
                   )}
                 </div>
@@ -430,8 +462,8 @@ const StepForm: React.FC = () => {
                   Avenida/Rua:
                 </Label>
                 <Input
-                  id="street"
-                  {...register("street", {
+                  id="rua"
+                  {...register("rua", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
                       message: "Informe a rua ou avenida",
@@ -440,9 +472,9 @@ const StepForm: React.FC = () => {
                   })}
                 />
 
-                {errors.street && (
+                {errors.rua && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.street.message}
+                    {errors.rua.message}
                   </p>
                 )}
               </div>
@@ -451,8 +483,8 @@ const StepForm: React.FC = () => {
                   Bairro:
                 </Label>
                 <Input
-                  id="neighborhood"
-                  {...register("neighborhood", {
+                  id="bairro"
+                  {...register("bairro", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
                       message: "Informe o nome do Bairro",
@@ -461,9 +493,9 @@ const StepForm: React.FC = () => {
                   })}
                 />
 
-                {errors.neighborhood && (
+                {errors.bairro && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.neighborhood.message}
+                    {errors.bairro.message}
                   </p>
                 )}
               </div>
@@ -473,8 +505,8 @@ const StepForm: React.FC = () => {
                     Cidade:
                   </Label>
                   <Input
-                    id="city"
-                    {...register("city", {
+                    id="cidade"
+                    {...register("cidade", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe a Cidade",
@@ -483,9 +515,9 @@ const StepForm: React.FC = () => {
                     })}
                   />
 
-                  {errors.city && (
+                  {errors.cidade && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.city.message}
+                      {errors.cidade.message}
                     </p>
                   )}
                 </div>
@@ -494,8 +526,8 @@ const StepForm: React.FC = () => {
                     UF:
                   </Label>
                   <Input
-                    id="state"
-                    {...register("state", {
+                    id="estado"
+                    {...register("estado", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
                         message: "Informe o UF",
@@ -504,9 +536,9 @@ const StepForm: React.FC = () => {
                     })}
                   />
 
-                  {errors.state && (
+                  {errors.estado && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.state.message}
+                      {errors.estado.message}
                     </p>
                   )}
                 </div>
@@ -524,10 +556,18 @@ const StepForm: React.FC = () => {
             <section className={`${formStep === 1 ? "block" : "hidden"}`}>
               <h2 className="font-semibold text-3xl mb-8">Momento atual...</h2>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="businessMoment" className="text-base mb-2">
+                <Label
+                  htmlFor="momentoAtualEmpreendimento"
+                  className="text-base mb-2"
+                >
                   Qual o momento atual do empreendimento?
                 </Label>
-                <Select>
+                <Select
+                  onValueChange={handleBusinessMomentChange}
+                  {...register("momentoAtualEmpreendimento", {
+                    required: { message: "Selecione uma opção", value: true },
+                  })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione uma opção" />
                   </SelectTrigger>
@@ -552,21 +592,26 @@ const StepForm: React.FC = () => {
                   </SelectContent>
                 </Select>
 
-                {errors.businessMoment && (
+                {errors.momentoAtualEmpreendimento && (
                   <p className="text-sm text-red-600 mt-2">
-                    {errors.businessMoment.message}
+                    {errors.momentoAtualEmpreendimento.message}
                   </p>
                 )}
               </div>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base mb-2">
+                <Label
+                  htmlFor="possuiEngenhariaClinica"
+                  className="text-base mb-2"
+                >
                   Possui engenharia clínica para apoiar o processo de seleção
                   dos equipamentos?
                 </Label>
                 <RadioGroup
                   className="flex mt-2"
-                  defaultValue={hasClinicalEngineering}
-                  onValueChange={handleFirstChange}
+                  onValueChange={handleHasClinicalEngineeringChange}
+                  {...register("possuiEngenhariaClinica", {
+                    required: { message: "Selecione uma opção", value: true },
+                  })}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="sim" id="sim" />
@@ -580,29 +625,42 @@ const StepForm: React.FC = () => {
               </div>
               {hasClinicalEngineering === "sim" && (
                 <div className="flex flex-col mt-4">
-                  <Label htmlFor="customer" className="text-base mb-2">
+                  <Label
+                    htmlFor="tipoEngenhariaClinica"
+                    className="text-base mb-2"
+                  >
                     Como é a sua Engenharia Clínica?
                   </Label>
-                  <RadioGroup defaultValue="propria" className="flex mt-2">
+                  <RadioGroup
+                    className="flex mt-2"
+                    onValueChange={handleTypeClinicalEngineeringChange}
+                    {...register("tipoEngenhariaClinica", {
+                      required: { message: "Selecione uma opção", value: true },
+                    })}
+                  >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="propria" id="propria" />
                       <Label htmlFor="propria">Própria</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="terceirizada" id="option-two" />
+                      <RadioGroupItem value="terceirizada" id="terceirizada" />
                       <Label htmlFor="terceirizada">Terceirizada</Label>
                     </div>
                   </RadioGroup>
                 </div>
               )}
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base mb-2">
-                  Do que sente mais falta no suporte da engenharia clinica?
+                <Label
+                  htmlFor="obsEngenhariaClinica"
+                  className="text-base mb-2"
+                >
+                  Do que sente mais falta no suporte da engenharia clinica?{" "}
+                  <span className="text-sm text-[#a7b928]">(opcional)</span>
                 </Label>
                 <Textarea
                   placeholder="Escreva aqui..."
-                  id="needing"
-                  {...register("needing", {})}
+                  id="obsEngenhariaClinica"
+                  {...register("obsEngenhariaClinica", {})}
                 />
               </div>
 
@@ -620,37 +678,47 @@ const StepForm: React.FC = () => {
                 Estamos quase lá...
               </h2>
               <div className="flex flex-col mt-4">
-                <Label htmlFor="customer" className="text-base mb-2">
+                <Label htmlFor="precisaCME" className="text-base mb-2">
                   Hospital irá implantar uma nova CME ou já possui CME?
                 </Label>
                 <RadioGroup
                   className="flex mt-2"
-                  defaultValue={hasClinicalEngineering}
-                  onValueChange={handleFirstChange}
+                  defaultValue={hasCME}
+                  onValueChange={handleHasCMEChange}
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Irei implantar" id="option-one" />
+                    <RadioGroupItem
+                      value="Irei implantar"
+                      id="irei-implantar"
+                    />
                     <Label htmlFor="Irei implantar">Irei implantar</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Já possuo" id="option-two" />
-                    <Label htmlFor="Já possuo">Já possuo</Label>
+                    <RadioGroupItem value="Ja possuo" id="ja-possuo" />
+                    <Label htmlFor="Ja possuo">Já possuo</Label>
                   </div>
                 </RadioGroup>
               </div>
-              {hasClinicalEngineering === "Já possuo" && (
+              {hasCME === "Ja possuo" && (
                 <div className="flex flex-col mt-4">
                   <Label htmlFor="customer" className="text-base mb-2">
                     Se você já possui uma CME, o que você busca?
                   </Label>
-                  <RadioGroup defaultValue="propria" className="flex mt-2">
+                  <RadioGroup
+                    defaultValue={seekCME}
+                    onValueChange={handleSeekCMEChange}
+                    className="flex mt-2"
+                  >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="propria" id="option-one" />
-                      <Label htmlFor="propria">Quero substituir</Label>
+                      <RadioGroupItem
+                        value="Substituir"
+                        id="quero-substituir"
+                      />
+                      <Label htmlFor="Quero substituir">Quero substituir</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="terceirizada" id="option-two" />
-                      <Label htmlFor="terceirizada">Quero ampliar</Label>
+                      <RadioGroupItem value="Ampliar" id="quero-ampliar" />
+                      <Label htmlFor="Quero ampliar">Quero ampliar</Label>
                     </div>
                   </RadioGroup>
                 </div>
@@ -801,7 +869,7 @@ const StepForm: React.FC = () => {
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="customer" className="text-base mb-2">
+                  <Label htmlFor="tipoProcessamento" className="text-base mb-2">
                     Qual o tipo de processamento?
                   </Label>
                   <Select>
@@ -818,27 +886,30 @@ const StepForm: React.FC = () => {
                     </SelectContent>
                   </Select>
 
-                  {errors.customer && (
+                  {errors.tipoProcessamento && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.customer.message}
+                      {errors.tipoProcessamento.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="numberOfSurgery" className="text-base mb-2">
+                  <Label
+                    htmlFor="numeroSalasCirurgias"
+                    className="text-base mb-2"
+                  >
                     Número de salas cirúrgicas
                   </Label>
                   <Input
-                    id="numberOfSurgery"
+                    id="numeroSalasCirurgias"
                     type="text"
-                    {...register("numberOfSurgery", {
+                    {...register("numeroSalasCirurgias", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberOfSurgery && (
+                  {errors.numeroSalasCirurgias && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberOfSurgery.message}
+                      {errors.numeroSalasCirurgias.message}
                     </p>
                   )}
                 </div>
@@ -846,116 +917,119 @@ const StepForm: React.FC = () => {
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
                   <Label
-                    htmlFor="numberSurgeryRoomDay"
+                    htmlFor="numeroCirurgiaSalaDia"
                     className="text-base mb-2"
                   >
                     Número de cirurgias/sala/dia
                   </Label>
                   <Input
-                    id="numberSurgeryRoomDay"
+                    id="numeroCirurgiaSalaDia"
                     type="text"
-                    {...register("numberSurgeryRoomDay", {
+                    {...register("numeroCirurgiaSalaDia", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberSurgeryRoomDay && (
+                  {errors.numeroCirurgiaSalaDia && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberSurgeryRoomDay.message}
+                      {errors.numeroCirurgiaSalaDia.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="numberBedUTI" className="text-base mb-2">
+                  <Label htmlFor="numeroLeitoUTI" className="text-base mb-2">
                     Número de leitos UTI
                   </Label>
                   <Input
-                    id="numberBedUTI"
-                    {...register("numberBedUTI", {
+                    id="numeroLeitoUTI"
+                    {...register("numeroLeitoUTI", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberBedUTI && (
+                  {errors.numeroLeitoUTI && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberBedUTI.message}
+                      {errors.numeroLeitoUTI.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="numberBedIntern" className="text-base mb-2">
+                  <Label
+                    htmlFor="numeroLeitoInternacao"
+                    className="text-base mb-2"
+                  >
                     Número de leitos Internação
                   </Label>
                   <Input
-                    id="numberBedIntern"
+                    id="numeroLeitoInternacao"
                     type="text"
-                    {...register("numberBedIntern", {
+                    {...register("numeroLeitoInternacao", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberBedIntern && (
+                  {errors.numeroLeitoInternacao && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberBedIntern.message}
+                      {errors.numeroLeitoInternacao.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="numberBedRPA" className="text-base mb-2">
+                  <Label htmlFor="numeroLeitoRPA" className="text-base mb-2">
                     Número de leitos RPA
                   </Label>
                   <Input
-                    id="numberBedRPA"
-                    {...register("numberBedRPA", {
+                    id="numeroLeitoRPA"
+                    {...register("numeroLeitoRPA", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberBedRPA && (
+                  {errors.numeroLeitoRPA && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberBedRPA.message}
+                      {errors.numeroLeitoRPA.message}
                     </p>
                   )}
                 </div>
               </div>
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
-                  <Label htmlFor="numberBedObs" className="text-base mb-2">
+                  <Label htmlFor="numeroLeitoObs" className="text-base mb-2">
                     Número de leitos Observações
                   </Label>
                   <Input
-                    id="numberBedObs"
+                    id="numeroLeitoObs"
                     type="text"
-                    {...register("numberBedObs", {
+                    {...register("numeroLeitoObs", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberBedObs && (
+                  {errors.numeroLeitoObs && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberBedObs.message}
+                      {errors.numeroLeitoObs.message}
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col mt-4 w-full">
                   <Label
-                    htmlFor="numberBedHospitalDay"
+                    htmlFor="numeroLeitoHospitalDia"
                     className="text-base mb-2"
                   >
                     Número de leitos Hospital Dia
                   </Label>
                   <Input
-                    id="numberBedHospitalDay"
-                    {...register("numberBedHospitalDay", {
+                    id="numeroLeitoHospitalDia"
+                    {...register("numeroLeitoHospitalDia", {
                       required: { message: "Preencha este campo", value: true },
                     })}
                   />
 
-                  {errors.numberBedHospitalDay && (
+                  {errors.numeroLeitoHospitalDia && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numberBedHospitalDay.message}
+                      {errors.numeroLeitoHospitalDia.message}
                     </p>
                   )}
                 </div>
@@ -1009,10 +1083,10 @@ const StepForm: React.FC = () => {
             </section>
           )}
 
-          {/* <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
+          <p className="mt-10">{isValid ? "Valid" : "Invalid"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>

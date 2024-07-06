@@ -4,6 +4,7 @@ import Footer from "./components/footer";
 import FormSection from "./components/formSection";
 import Hero from "./components/hero";
 import NavbarMenu from "./components/navbarMenu";
+import IndexPage from "./components/test";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <About />
       <FormSection />
       <Footer />
+      {/* <IndexPage /> */}
     </>
   );
 }
