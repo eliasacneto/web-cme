@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "./ui/input";
+import Swal from "sweetalert2";
 
 import InputMask from "react-input-mask";
 import {
@@ -14,9 +15,66 @@ import {
 } from "./ui/select";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const invoices = [
+  {
+    invoice: "INV001",
+    paymentStatus: "Paid",
+    totalAmount: "$250.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV002",
+    paymentStatus: "Pending",
+    totalAmount: "$150.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV003",
+    paymentStatus: "Unpaid",
+    totalAmount: "$350.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV004",
+    paymentStatus: "Paid",
+    totalAmount: "$450.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV005",
+    paymentStatus: "Paid",
+    totalAmount: "$550.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV006",
+    paymentStatus: "Pending",
+    totalAmount: "$200.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV007",
+    paymentStatus: "Unpaid",
+    totalAmount: "$300.00",
+    paymentMethod: "Credit Card",
+  },
+];
+
 import axios from "axios";
 
-const STEPS_AMOUNT = 4;
+const STEPS_AMOUNT = 3;
 
 interface FinishSectionButtonProps {
   onClick: () => void;
@@ -75,14 +133,50 @@ interface FormValues {
   momentoAtualEmpreendimento: string;
   possuiEngenhariaClinica: string;
   tipoEngenhariaClinica: string;
-  obsEngenhariaClinica: string;
+
   precisaCME: string;
   busco: string;
   diaSemanaCirurgia: string[];
   intervaloPicoCME: string;
   tipoProcessamento: string;
   aceitarTermos: string;
+  obsEngenhariaClinica: string;
 }
+
+const AutoCloseAlert: React.FC = () => {
+  useEffect(() => {
+    let timerInterval: NodeJS.Timeout;
+
+    Swal.fire({
+      title: "Auto close alert!",
+      html: "I will close in <b></b> milliseconds.",
+      timer: 2000,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+        const timer = Swal.getPopup()?.querySelector("b");
+        if (timer) {
+          timerInterval = setInterval(() => {
+            timer.textContent = `${Swal.getTimerLeft()}`;
+          }, 100);
+        }
+      },
+      willClose: () => {
+        clearInterval(timerInterval);
+      },
+    }).then((result) => {
+      if (result.dismiss === Swal.DismissReason.timer) {
+        console.log("I was closed by the timer");
+      }
+    });
+
+    return () => {
+      clearInterval(timerInterval);
+    };
+  }, []);
+
+  return null;
+};
 
 const StepForm: React.FC = () => {
   const [formStep, setFormStep] = React.useState<number>(0);
@@ -225,6 +319,32 @@ const StepForm: React.FC = () => {
         valuesWithId
       );
       console.log(response.data);
+      // Adicionando o alerta de autoclose do SweetAlert2
+      let timerInterval: NodeJS.Timeout;
+
+      Swal.fire({
+        title: "Aguarde...",
+        text: "Estamos preparando as melhores recomendações",
+        // html: "Este alerta fechará em <b></b> milissegundos.",
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: () => {
+          Swal.showLoading();
+          const timer = Swal.getPopup()?.querySelector("b");
+          if (timer) {
+            timerInterval = setInterval(() => {
+              timer.textContent = `${Swal.getTimerLeft()}`;
+            }, 100);
+          }
+        },
+        willClose: () => {
+          clearInterval(timerInterval);
+        },
+      }).then((result) => {
+        if (result.dismiss === Swal.DismissReason.timer) {
+          console.log("Alerta fechado pelo temporizador");
+        }
+      });
     } catch (error) {
       console.error("Erro ao enviar os dados para a API", error);
     }
@@ -626,7 +746,7 @@ const StepForm: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="nao" id="nao" />
-                    <Label htmlFor="não">Não</Label>
+                    <Label htmlFor="nao">Não</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -639,18 +759,22 @@ const StepForm: React.FC = () => {
                     Como é a sua Engenharia Clínica?
                   </Label>
                   <RadioGroup
+                    defaultValue={typeClinicalEngineering}
                     className="flex mt-2"
                     onValueChange={handleTypeClinicalEngineeringChange}
                     {...register("tipoEngenhariaClinica", {
-                      required: { message: "Selecione uma opção", value: true },
+                      required:
+                        hasClinicalEngineering === "sim"
+                          ? { message: "Selecione uma opção", value: true }
+                          : false,
                     })}
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="propria" id="propria" />
+                      <RadioGroupItem value="Própria" id="propria" />
                       <Label htmlFor="propria">Própria</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="terceirizada" id="terceirizada" />
+                      <RadioGroupItem value="Terceirizada" id="terceirizada" />
                       <Label htmlFor="terceirizada">Terceirizada</Label>
                     </div>
                   </RadioGroup>
@@ -715,6 +839,9 @@ const StepForm: React.FC = () => {
                     defaultValue={seekCME}
                     onValueChange={handleSeekCMEChange}
                     className="flex mt-2"
+                    {...register("busco", {
+                      required: { message: "Selecione uma opção", value: true },
+                    })}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem
@@ -1099,7 +1226,67 @@ const StepForm: React.FC = () => {
               <h2 className="font-semibold text-3xl mb-8">
                 Confira o resultado!
               </h2>
-              <p>Informações geradas baseada nos cálculos...</p>
+              <h5 className="font-bold text-slate-950 mb-4 antialiased text-lg">
+                Autoclaves recomendadas:
+              </h5>
+              <Table className="rounded">
+                <TableHeader className="">
+                  <TableRow className="bg-slate-900  rounded-lg">
+                    <TableHead className="w-[100px] font-bold text-white"></TableHead>
+                    <TableHead className="font-bold text-white">
+                      Marca
+                    </TableHead>
+                    <TableHead className="font-bold text-white">
+                      Modelo
+                    </TableHead>
+                    <TableHead className="text-right font-bold text-white">
+                      Preço
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((invoice) => (
+                    <TableRow key={invoice.invoice}>
+                      <TableCell className="font-medium">img-marca</TableCell>
+                      <TableCell>Nome da Marca</TableCell>
+                      <TableCell>Modelo 1, Modelo 2</TableCell>
+                      <TableCell className="text-right">
+                        R$0,00 - R$0,00
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <hr />
+              <h5 className="font-bold text-slate-950 mb-4 mt-5 antialiased text-lg">
+                Lavadoras recomendadas:
+              </h5>
+              <Table className="rounded">
+                <TableHeader className="">
+                  <TableRow className="bg-slate-900  rounded-lg">
+                    <TableHead className="w-[100px] font-bold text-white"></TableHead>
+                    <TableHead className="font-bold text-white">
+                      Marca
+                    </TableHead>
+                    <TableHead className="font-bold text-white">
+                      Modelo
+                    </TableHead>
+                    <TableHead className="text-right font-bold text-white">
+                      Preço
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((invoice) => (
+                    <TableRow key={invoice.invoice}>
+                      <TableCell className="font-medium">img-marca</TableCell>
+                      <TableCell>Nome da Marca</TableCell>
+                      <TableCell>Modelo 1, Modelo 2</TableCell>
+                      <TableCell className="text-right">R$0,00</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
               <button
                 onClick={() => alert("Mostra um dialog legal aqui")}
                 className="mt-6 bg-[#a7b928] text-white text-lg py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
@@ -1110,10 +1297,10 @@ const StepForm: React.FC = () => {
             </section>
           )}
 
-          {/* <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
+          <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>
