@@ -19,9 +19,7 @@ import { Textarea } from "./ui/textarea";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -133,53 +131,16 @@ interface FormValues {
   momentoAtualEmpreendimento: string;
   possuiEngenhariaClinica: string;
   tipoEngenhariaClinica: string;
-
   precisaCME: string;
   busco: string;
-  diaSemanaCirurgia: string[];
   intervaloPicoCME: string;
   tipoProcessamento: string;
   aceitarTermos: string;
   obsEngenhariaClinica: string;
 }
 
-const AutoCloseAlert: React.FC = () => {
-  useEffect(() => {
-    let timerInterval: NodeJS.Timeout;
-
-    Swal.fire({
-      title: "Auto close alert!",
-      html: "I will close in <b></b> milliseconds.",
-      timer: 2000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading();
-        const timer = Swal.getPopup()?.querySelector("b");
-        if (timer) {
-          timerInterval = setInterval(() => {
-            timer.textContent = `${Swal.getTimerLeft()}`;
-          }, 100);
-        }
-      },
-      willClose: () => {
-        clearInterval(timerInterval);
-      },
-    }).then((result) => {
-      if (result.dismiss === Swal.DismissReason.timer) {
-        console.log("I was closed by the timer");
-      }
-    });
-
-    return () => {
-      clearInterval(timerInterval);
-    };
-  }, []);
-
-  return null;
-};
-
 const StepForm: React.FC = () => {
-  const [formStep, setFormStep] = React.useState<number>(0);
+  const [formStep, setFormStep] = useState<number>(0);
   const [id, setId] = useState(1);
 
   const [hasClinicalEngineering, setHasClinicalEngineering] =
@@ -203,19 +164,6 @@ const StepForm: React.FC = () => {
     domingo: false,
   });
 
-  const updateDiaSemanaCirurgia = (newSelectedDays: SelectedDays) => {
-    let days: string[];
-    if (newSelectedDays.todosDias) {
-      days = ["todosDias"];
-    } else {
-      days = Object.keys(newSelectedDays).filter(
-        (day) =>
-          day !== "todosDias" && newSelectedDays[day as keyof SelectedDays]
-      );
-    }
-    setValue("diaSemanaCirurgia", days);
-  };
-
   const handleAllDaysChange = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setIsAllDaysChecked(checked);
@@ -230,7 +178,6 @@ const StepForm: React.FC = () => {
       domingo: checked,
     };
     setSelectedDays(newSelectedDays);
-    updateDiaSemanaCirurgia(newSelectedDays);
   };
 
   const handleDayChange =
@@ -238,10 +185,9 @@ const StepForm: React.FC = () => {
       const newSelectedDays = {
         ...selectedDays,
         [day]: e.target.checked,
-        todosDias: false, // Uncheck "todosDias" if individual days are being checked
+        todosDias: false,
       };
       setSelectedDays(newSelectedDays);
-      updateDiaSemanaCirurgia(newSelectedDays);
     };
 
   const {
@@ -250,6 +196,7 @@ const StepForm: React.FC = () => {
     handleSubmit,
     formState: { errors, isValid },
     watch,
+    getValues, // Adicionado para obter os valores do formulário
   } = useForm<FormValues>({
     mode: "onChange",
   });
@@ -300,57 +247,91 @@ const StepForm: React.FC = () => {
     }
   }, [cepValue, setValue]);
 
-  const handleStepCompletion = () => {
-    setFormStep((cur) => cur + 1);
-    // alert("Acabou!");
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const [lastCheckedEmail, setLastCheckedEmail] = useState("");
+
+  const handleCheckEmailExists = async (
+    values: FormValues
+  ): Promise<boolean> => {
+    console.log(JSON.stringify(values, null, 2));
+    try {
+      const emailCheckResponse = await axios.post(
+        "http://localhost:8000/lead/formcheck",
+        {
+          hospitalEmail: values.hospitalEmail,
+        }
+      );
+      if (emailCheckResponse.data.exists) {
+        console.log(
+          "Este e-mail já está registrado. Por favor, use outro e-mail."
+        );
+        Swal.fire({
+          title: "Ops!",
+          text: "Parece que você já obteve nossas recomendações!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#a7b928",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Solicitar novas recomendações",
+          cancelButtonText: "Fechar",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.open(
+              "https://api.whatsapp.com/send?phone=5524981191448&text=Ol%C3%A1,%20vim%20pelo%20site%20e%20gostaria%20de%20solicitar%20uma%20nova%20recomenda%C3%A7%C3%A3o%20de%20Autoclaves%20e%20Lavadoras!",
+              "_blank"
+            );
+          }
+        });
+
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Erro ao enviar os dados para a API", error);
+      return false;
+    }
+  };
+
+  const handleStepCompletion = async (values: FormValues) => {
+    const currentEmail = values.hospitalEmail;
+
+    if (!isEmailChecked || currentEmail !== lastCheckedEmail) {
+      const emailExists = await handleCheckEmailExists(values);
+      setIsEmailChecked(true);
+      setIsEmailValid(!emailExists);
+      setLastCheckedEmail(currentEmail);
+
+      if (!emailExists) {
+        setFormStep((cur) => cur + 1);
+      }
+    } else if (isEmailValid) {
+      setFormStep((cur) => cur + 1);
+    }
+  };
+
+  const handleNext = async () => {
+    const values = getValues();
+    await handleStepCompletion(values);
   };
 
   const handleGoBackToPreviousStep = () => {
     setFormStep((cur) => cur - 1);
   };
 
-  const onSubmit: SubmitHandler<FormValues> = async (values) => {
-    const valuesWithId = { id, ...values };
-    console.log(JSON.stringify(values, null, 2));
-
+  const onSubmit: SubmitHandler<FormValues> = async (values: FormValues) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8000/lead",
-        valuesWithId
-      );
-      console.log(response.data);
-      // Adicionando o alerta de autoclose do SweetAlert2
-      let timerInterval: NodeJS.Timeout;
-
-      Swal.fire({
-        title: "Aguarde...",
-        text: "Estamos preparando as melhores recomendações",
-        // html: "Este alerta fechará em <b></b> milissegundos.",
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: () => {
-          Swal.showLoading();
-          const timer = Swal.getPopup()?.querySelector("b");
-          if (timer) {
-            timerInterval = setInterval(() => {
-              timer.textContent = `${Swal.getTimerLeft()}`;
-            }, 100);
-          }
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
-        },
-      }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.timer) {
-          console.log("Alerta fechado pelo temporizador");
-        }
-      });
+      const response = await axios.post("http://localhost:8000/lead", values);
+      console.log("Dados enviados com sucesso:", response.data);
+      setId((prevId) => prevId + 1);
     } catch (error) {
-      console.error("Erro ao enviar os dados para a API", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Erro da API:", error.response?.data);
+      } else {
+        console.error("Erro ao enviar os dados para a API Submit", error);
+      }
     }
-    setId((prevId) => prevId + 1);
-
-    handleStepCompletion();
   };
 
   interface CheckboxProps {
@@ -360,7 +341,12 @@ const StepForm: React.FC = () => {
     disabled?: boolean;
   }
 
-  function Checkbox({ id, checked, onChange, disabled }: CheckboxProps) {
+  const Checkbox: React.FC<CheckboxProps> = ({
+    id,
+    checked,
+    onChange,
+    disabled,
+  }) => {
     return (
       <input
         type="checkbox"
@@ -371,7 +357,7 @@ const StepForm: React.FC = () => {
         className="form-checkbox h-4 w-4 checked:bg-[#A4BA25] text-white transition duration-150 ease-in-out"
       />
     );
-  }
+  };
 
   interface LabelProps {
     htmlFor: string;
@@ -379,13 +365,13 @@ const StepForm: React.FC = () => {
     className?: string;
   }
 
-  function Label({ htmlFor, children, className }: LabelProps) {
+  const Label: React.FC<LabelProps> = ({ htmlFor, children, className }) => {
     return (
       <label htmlFor={htmlFor} className={className}>
         {children}
       </label>
     );
-  }
+  };
 
   return (
     <div className=" w-full mt-10 mb-24 rounded-lg shadow-2xl bg-white overflow-hidden mx-3 z-10">
@@ -671,10 +657,7 @@ const StepForm: React.FC = () => {
                 </div>
               </div>
 
-              <FinishSectionButton
-                onClick={handleStepCompletion}
-                isDisabled={!isValid}
-              >
+              <FinishSectionButton onClick={handleNext} isDisabled={!isValid}>
                 Próximo
               </FinishSectionButton>
             </section>
@@ -795,10 +778,7 @@ const StepForm: React.FC = () => {
                 />
               </div>
 
-              <FinishSectionButton
-                onClick={handleStepCompletion}
-                isDisabled={!isValid}
-              >
+              <FinishSectionButton onClick={handleNext} isDisabled={!isValid}>
                 Próximo
               </FinishSectionButton>
             </section>
@@ -1214,7 +1194,8 @@ const StepForm: React.FC = () => {
               </div>
               <button
                 disabled={!isValid}
-                type="submit"
+                onClick={handleNext}
+                // type="submit"
                 className="mt-6 bg-[#a7b928] text-white py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
               >
                 Conferir resultado
@@ -1232,7 +1213,6 @@ const StepForm: React.FC = () => {
               <Table className="rounded">
                 <TableHeader className="">
                   <TableRow className="bg-slate-900  rounded-lg">
-                    <TableHead className="w-[100px] font-bold text-white"></TableHead>
                     <TableHead className="font-bold text-white">
                       Marca
                     </TableHead>
@@ -1247,7 +1227,6 @@ const StepForm: React.FC = () => {
                 <TableBody>
                   {invoices.map((invoice) => (
                     <TableRow key={invoice.invoice}>
-                      <TableCell className="font-medium">img-marca</TableCell>
                       <TableCell>Nome da Marca</TableCell>
                       <TableCell>Modelo 1, Modelo 2</TableCell>
                       <TableCell className="text-right">
@@ -1264,7 +1243,6 @@ const StepForm: React.FC = () => {
               <Table className="rounded">
                 <TableHeader className="">
                   <TableRow className="bg-slate-900  rounded-lg">
-                    <TableHead className="w-[100px] font-bold text-white"></TableHead>
                     <TableHead className="font-bold text-white">
                       Marca
                     </TableHead>
@@ -1279,7 +1257,6 @@ const StepForm: React.FC = () => {
                 <TableBody>
                   {invoices.map((invoice) => (
                     <TableRow key={invoice.invoice}>
-                      <TableCell className="font-medium">img-marca</TableCell>
                       <TableCell>Nome da Marca</TableCell>
                       <TableCell>Modelo 1, Modelo 2</TableCell>
                       <TableCell className="text-right">R$0,00</TableCell>
