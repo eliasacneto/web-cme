@@ -1360,7 +1360,12 @@ const StepForm: React.FC = () => {
                 </TableBody>
               </Table>
               <button
-                onClick={() => alert("Mostra um dialog legal aqui")}
+                onClick={() =>
+                  window.open(
+                    "https://api.whatsapp.com/send?phone=5524981191448&text=Ol%C3%A1,%20vim%20pelo%20site%20e%20gostaria%20de%20solicitar%20um%20relatório%20detalhado%20das%20Autoclaves%20e%20Lavadoras!",
+                    "_blank"
+                  )
+                }
                 className="mt-6 bg-[#a7b928] text-white text-lg py-3 px-6 uppercase font-bold rounded-md font-econdensed hover:bg-[#a7b928] hover:text-white hover:shadow-lg transition-all duration-500 w-full disabled:bg-gray-300 "
               >
                 <FontAwesomeIcon icon={faChartPie} className="mr-2" size="lg" />
