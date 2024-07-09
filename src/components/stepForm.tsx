@@ -133,6 +133,7 @@ interface FormValues {
   tipoEngenhariaClinica: string;
   precisaCME: string;
   busco: string;
+  diaSemanaCirurgia: string[];
   intervaloPicoCME: string;
   tipoProcessamento: string;
   aceitarTermos: string;
@@ -144,13 +145,13 @@ const StepForm: React.FC = () => {
   const [id, setId] = useState(1);
 
   const [hasClinicalEngineering, setHasClinicalEngineering] =
-    useState<string>("nao");
+    useState<string>("nulo");
   const [typeClinicalEngineering, setTypeClinicalEngineering] =
-    useState<string>("propria");
+    useState<string>("nulo");
 
   const [hasCME, setHasCME] = useState<string>("irei-implantar");
 
-  const [seekCME, setSeekCME] = useState<string>("quero-substituir");
+  const [seekCME, setSeekCME] = useState<string>("nulo");
 
   const [isAllDaysChecked, setIsAllDaysChecked] = useState<boolean>(false);
   const [selectedDays, setSelectedDays] = useState<SelectedDays>({
@@ -178,6 +179,7 @@ const StepForm: React.FC = () => {
       domingo: checked,
     };
     setSelectedDays(newSelectedDays);
+    updateDiaSemanaCirurgia(newSelectedDays);
   };
 
   const handleDayChange =
@@ -190,6 +192,19 @@ const StepForm: React.FC = () => {
       setSelectedDays(newSelectedDays);
     };
 
+  const updateDiaSemanaCirurgia = (newSelectedDays: SelectedDays) => {
+    let days: string[];
+    if (newSelectedDays.todosDias) {
+      days = ["todosDias"];
+    } else {
+      days = Object.keys(newSelectedDays).filter(
+        (day) =>
+          day !== "todosDias" && newSelectedDays[day as keyof SelectedDays]
+      );
+    }
+    setValue("diaSemanaCirurgia", days);
+  };
+
   const {
     setValue,
     register,
@@ -199,6 +214,10 @@ const StepForm: React.FC = () => {
     getValues, // Adicionado para obter os valores do formulário
   } = useForm<FormValues>({
     mode: "onChange",
+    defaultValues: {
+      tipoEngenhariaClinica: "Não selecionado",
+      busco: "Não selecionado",
+    },
   });
 
   const cepValue = watch("cep");
@@ -218,12 +237,21 @@ const StepForm: React.FC = () => {
   const handleHasCMEChange = (value: string) => {
     setHasCME(value);
     setValue("precisaCME", value);
+    if (value !== "Ja possuo") {
+      setValue("busco", "Não selecionado");
+    }
   };
 
   const handleSeekCMEChange = (value: string) => {
     setSeekCME(value);
     setValue("busco", value);
   };
+
+  useEffect(() => {
+    if (hasCME !== "Ja possuo") {
+      setValue("busco", "Não selecionado");
+    }
+  }, [hasCME, setValue]);
 
   const handleProcessTypeChange = (value: string) => {
     setValue("tipoProcessamento", value);
@@ -433,14 +461,16 @@ const StepForm: React.FC = () => {
                   <Label htmlFor="hospitalEmail" className="text-base mb-2">
                     E-mail do hospital:
                   </Label>
-                  <Input
+                  <input
                     id="hospitalEmail"
                     type="email"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     {...register("hospitalEmail", {
-                      required: { message: "Preencha este campo", value: true },
-                      minLength: {
-                        message: "Preencha com um e-mail válido!",
-                        value: 3,
+                      required: { value: true, message: "Preencha este campo" },
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                        message: "Informe um e-mail válido!",
                       },
                     })}
                   />
@@ -719,20 +749,40 @@ const StepForm: React.FC = () => {
                 <RadioGroup
                   className="flex mt-2"
                   onValueChange={handleHasClinicalEngineeringChange}
-                  {...register("possuiEngenhariaClinica", {
-                    required: { message: "Selecione uma opção", value: true },
-                  })}
+                  defaultValue="nao"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="sim" id="sim" />
+                    <RadioGroupItem
+                      value="sim"
+                      id="sim"
+                      {...register("possuiEngenhariaClinica", {
+                        required: {
+                          message: "Selecione uma opção",
+                          value: true,
+                        },
+                      })}
+                    />
                     <Label htmlFor="sim">Sim</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="nao" id="nao" />
+                    <RadioGroupItem
+                      value="nao"
+                      id="nao"
+                      {...register("possuiEngenhariaClinica", {
+                        required: {
+                          message: "Selecione uma opção",
+                          value: true,
+                        },
+                      })}
+                    />
                     <Label htmlFor="nao">Não</Label>
                   </div>
                 </RadioGroup>
+                {errors.possuiEngenhariaClinica && (
+                  <p>{errors.possuiEngenhariaClinica.message}</p>
+                )}
               </div>
+
               {hasClinicalEngineering === "sim" && (
                 <div className="flex flex-col mt-4">
                   <Label
@@ -745,22 +795,37 @@ const StepForm: React.FC = () => {
                     defaultValue={typeClinicalEngineering}
                     className="flex mt-2"
                     onValueChange={handleTypeClinicalEngineeringChange}
-                    {...register("tipoEngenhariaClinica", {
-                      required:
-                        hasClinicalEngineering === "sim"
-                          ? { message: "Selecione uma opção", value: true }
-                          : false,
-                    })}
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Própria" id="propria" />
+                      <RadioGroupItem
+                        value="Própria"
+                        id="propria"
+                        {...register("tipoEngenhariaClinica", {
+                          required: {
+                            value: hasClinicalEngineering === "sim",
+                            message: "Selecione uma opção",
+                          },
+                        })}
+                      />
                       <Label htmlFor="propria">Própria</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Terceirizada" id="terceirizada" />
+                      <RadioGroupItem
+                        value="Terceirizada"
+                        id="terceirizada"
+                        {...register("tipoEngenhariaClinica", {
+                          required: {
+                            value: hasClinicalEngineering === null,
+                            message: "Selecione uma opção",
+                          },
+                        })}
+                      />
                       <Label htmlFor="terceirizada">Terceirizada</Label>
                     </div>
                   </RadioGroup>
+                  {errors.tipoEngenhariaClinica && (
+                    <p>{errors.tipoEngenhariaClinica.message}</p>
+                  )}
                 </div>
               )}
               <div className="flex flex-col mt-4">
@@ -794,22 +859,39 @@ const StepForm: React.FC = () => {
                 </Label>
                 <RadioGroup
                   className="flex mt-2"
-                  defaultValue={hasCME}
+                  defaultValue="Irei implantar"
                   onValueChange={handleHasCMEChange}
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
                       value="Irei implantar"
                       id="irei-implantar"
+                      {...register("precisaCME", {
+                        required: {
+                          message: "Selecione uma opção",
+                          value: true,
+                        },
+                      })}
                     />
-                    <Label htmlFor="Irei implantar">Irei implantar</Label>
+                    <Label htmlFor="irei-implantar">Irei implantar</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Ja possuo" id="ja-possuo" />
-                    <Label htmlFor="Ja possuo">Já possuo</Label>
+                    <RadioGroupItem
+                      value="Ja possuo"
+                      id="ja-possuo"
+                      {...register("precisaCME", {
+                        required: {
+                          message: "Selecione uma opção",
+                          value: true,
+                        },
+                      })}
+                    />
+                    <Label htmlFor="ja-possuo">Já possuo</Label>
                   </div>
                 </RadioGroup>
+                {errors.precisaCME && <p>{errors.precisaCME.message}</p>}
               </div>
+
               {hasCME === "Ja possuo" && (
                 <div className="flex flex-col mt-4">
                   <Label htmlFor="customer" className="text-base mb-2">
@@ -819,22 +901,35 @@ const StepForm: React.FC = () => {
                     defaultValue={seekCME}
                     onValueChange={handleSeekCMEChange}
                     className="flex mt-2"
-                    {...register("busco", {
-                      required: { message: "Selecione uma opção", value: true },
-                    })}
                   >
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem
                         value="Substituir"
                         id="quero-substituir"
+                        {...register("busco", {
+                          required: {
+                            value: hasCME === "Ja possuo",
+                            message: "Selecione uma opção",
+                          },
+                        })}
                       />
-                      <Label htmlFor="Quero substituir">Quero substituir</Label>
+                      <Label htmlFor="quero-substituir">Quero substituir</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Ampliar" id="quero-ampliar" />
-                      <Label htmlFor="Quero ampliar">Quero ampliar</Label>
+                      <RadioGroupItem
+                        value="Ampliar"
+                        id="quero-ampliar"
+                        {...register("busco", {
+                          required: {
+                            value: hasCME === "Ja possuo",
+                            message: "Selecione uma opção",
+                          },
+                        })}
+                      />
+                      <Label htmlFor="quero-ampliar">Quero ampliar</Label>
                     </div>
                   </RadioGroup>
+                  {errors.busco && <p>{errors.busco.message}</p>}
                 </div>
               )}
               <div className="flex flex-col mt-4 w-full">
