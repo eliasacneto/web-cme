@@ -1082,7 +1082,7 @@ const StepForm: React.FC = () => {
               <div className="flex flex-col lg:flex-row lg:gap-4">
                 <div className="flex flex-col mt-4 w-full">
                   <Label htmlFor="tipoProcessamento" className="text-base mb-2">
-                    Qual o tipo de processamento?
+                    Deseja processar os tecidos?
                   </Label>
                   <Select
                     onValueChange={handleProcessTypeChange}
@@ -1094,10 +1094,8 @@ const StepForm: React.FC = () => {
                       <SelectValue placeholder="Selecione uma opção" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Tecidos">Tecidos</SelectItem>
-                      <SelectItem value="Apenas instrumental">
-                        Apenas instrumental
-                      </SelectItem>
+                      <SelectItem value="0">Sim</SelectItem>
+                      <SelectItem value="1">Não</SelectItem>
                     </SelectContent>
                   </Select>
 
