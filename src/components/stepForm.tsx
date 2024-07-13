@@ -351,7 +351,7 @@ const StepForm: React.FC = () => {
   const onSubmit: SubmitHandler<FormValues> = async (values: FormValues) => {
     try {
       const response = await axios.post("http://localhost:8000/lead", values);
-      console.log("Dados enviados com sucesso:", response.data);
+      console.log(`Dados enviados com sucesso: ${id}`, response.data);
       setId((prevId) => prevId + 1);
     } catch (error) {
       if (axios.isAxiosError(error)) {
