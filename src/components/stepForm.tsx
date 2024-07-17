@@ -135,7 +135,7 @@ interface FormValues {
   busco: string;
   diaSemanaCirurgia: string[];
   intervaloPicoCME: string;
-  tipoProcessamento: string;
+  processaTecido: string;
   aceitarTermos: string;
   obsEngenhariaClinica: string;
 }
@@ -254,7 +254,7 @@ const StepForm: React.FC = () => {
   }, [hasCME, setValue]);
 
   const handleProcessTypeChange = (value: string) => {
-    setValue("tipoProcessamento", value);
+    setValue("processaTecido", value);
   };
 
   useEffect(() => {
@@ -1086,7 +1086,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Select
                     onValueChange={handleProcessTypeChange}
-                    {...register("tipoProcessamento", {
+                    {...register("processaTecido", {
                       required: { message: "Selecione uma opção", value: true },
                     })}
                   >
@@ -1099,9 +1099,9 @@ const StepForm: React.FC = () => {
                     </SelectContent>
                   </Select>
 
-                  {errors.tipoProcessamento && (
+                  {errors.processaTecido && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.tipoProcessamento.message}
+                      {errors.processaTecido.message}
                     </p>
                   )}
                 </div>
