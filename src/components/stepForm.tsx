@@ -121,7 +121,7 @@ interface FormValues {
   bairro: string;
   cidade: string;
   estado: string;
-  numeroSalasCirurgias: number;
+  numeroSalasCirurgicas: number;
   numeroCirurgiaSalaDia: number;
   numeroLeitoUTI: number;
   numeroLeitoInternacao: number;
@@ -190,6 +190,7 @@ const StepForm: React.FC = () => {
         todosDias: false,
       };
       setSelectedDays(newSelectedDays);
+      updateDiaSemanaCirurgia(newSelectedDays);
     };
 
   const updateDiaSemanaCirurgia = (newSelectedDays: SelectedDays) => {
@@ -204,7 +205,6 @@ const StepForm: React.FC = () => {
     }
     setValue("diaSemanaCirurgia", days);
   };
-
   const {
     setValue,
     register,
@@ -442,6 +442,7 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Input
                   id="nomeLead"
+                  placeholder="Informe o seu nome"
                   {...register("nomeLead", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
@@ -464,7 +465,8 @@ const StepForm: React.FC = () => {
                   <input
                     id="hospitalEmail"
                     type="email"
-                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="email@email.com"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-250"
                     {...register("hospitalEmail", {
                       required: { value: true, message: "Preencha este campo" },
                       pattern: {
@@ -487,7 +489,8 @@ const StepForm: React.FC = () => {
                   </Label>
                   <InputMask
                     mask="(99) 99999-9999"
-                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="(00) 00000-0000"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     id="hospitalContato"
                     {...register("hospitalContato", {
                       required: { message: "Preencha este campo", value: true },
@@ -511,6 +514,7 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Input
                   id="hospitalNome"
+                  placeholder="Informe o nome do hospital"
                   {...register("hospitalNome", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
@@ -532,8 +536,9 @@ const StepForm: React.FC = () => {
                     <span className="text-sm text-[#a7b928]">(opcional)</span>
                   </Label>
                   <InputMask
-                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-250"
                     mask="99.999.999/9999-99"
+                    placeholder="00.000.000/0000-00"
                     id="cnpj"
                   />
                 </div>
@@ -543,6 +548,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="cargo"
+                    placeholder="Ex:. Diretor"
                     {...register("cargo", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: { message: "Informe um cargo", value: 3 },
@@ -562,8 +568,9 @@ const StepForm: React.FC = () => {
                     CEP:
                   </Label>
                   <InputMask
-                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    className=" flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-250"
                     mask="99999-999"
+                    placeholder="00000-000"
                     id="cep"
                     {...register("cep", {
                       required: { message: "Preencha este campo", value: true },
@@ -584,6 +591,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numero"
+                    placeholder="Ex:. 42"
                     {...register("numero", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
@@ -606,6 +614,7 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Input
                   id="rua"
+                  placeholder="Informe o nome da Avenida/Rua"
                   {...register("rua", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
@@ -627,6 +636,7 @@ const StepForm: React.FC = () => {
                 </Label>
                 <Input
                   id="bairro"
+                  placeholder="Informe o nome do Bairro"
                   {...register("bairro", {
                     required: { message: "Preencha este campo", value: true },
                     minLength: {
@@ -649,6 +659,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="cidade"
+                    placeholder="Informe o nome da Cidade"
                     {...register("cidade", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
@@ -670,6 +681,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="estado"
+                    placeholder="Informe o nome do Estado"
                     {...register("estado", {
                       required: { message: "Preencha este campo", value: true },
                       minLength: {
@@ -753,7 +765,7 @@ const StepForm: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
-                      value="sim"
+                      value="não"
                       id="sim"
                       {...register("possuiEngenhariaClinica", {
                         required: {
@@ -1066,6 +1078,7 @@ const StepForm: React.FC = () => {
                 <Input
                   id="intervaloPicoCME"
                   type="number"
+                  placeholder=" Ex:. 12"
                   {...register("intervaloPicoCME", {
                     required: {
                       message: "Preencha este campo em horas",
@@ -1114,8 +1127,9 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroSalasCirurgias"
+                    placeholder=" Ex.: 6"
                     type="number"
-                    {...register("numeroSalasCirurgias", {
+                    {...register("numeroSalasCirurgicas", {
                       required: {
                         message: "Preencha com a quantidade",
                         value: true,
@@ -1123,9 +1137,9 @@ const StepForm: React.FC = () => {
                     })}
                   />
 
-                  {errors.numeroSalasCirurgias && (
+                  {errors.numeroSalasCirurgicas && (
                     <p className="text-sm text-red-600 mt-2">
-                      {errors.numeroSalasCirurgias.message}
+                      {errors.numeroSalasCirurgicas.message}
                     </p>
                   )}
                 </div>
@@ -1140,6 +1154,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroCirurgiaSalaDia"
+                    placeholder=" Ex.: 10"
                     type="number"
                     {...register("numeroCirurgiaSalaDia", {
                       required: {
@@ -1162,6 +1177,7 @@ const StepForm: React.FC = () => {
                   <Input
                     type="number"
                     id="numeroLeitoUTI"
+                    placeholder=" Ex.: 30"
                     {...register("numeroLeitoUTI", {
                       required: {
                         message: "Preencha com a quantidade",
@@ -1187,6 +1203,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroLeitoInternacao"
+                    placeholder=" Ex.: 80"
                     type="number"
                     {...register("numeroLeitoInternacao", {
                       required: {
@@ -1209,6 +1226,7 @@ const StepForm: React.FC = () => {
                   <Input
                     type="number"
                     id="numeroLeitoRPA"
+                    placeholder=" Ex.: 35"
                     {...register("numeroLeitoRPA", {
                       required: {
                         message: "Preencha com a quantidade",
@@ -1231,6 +1249,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     id="numeroLeitoObs"
+                    placeholder=" Ex.: 14"
                     type="number"
                     {...register("numeroLeitoObs", {
                       required: {
@@ -1255,6 +1274,7 @@ const StepForm: React.FC = () => {
                   </Label>
                   <Input
                     type="number"
+                    placeholder=" Ex.: 20"
                     id="numeroLeitoHospitalDia"
                     {...register("numeroLeitoHospitalDia", {
                       required: {
@@ -1372,10 +1392,10 @@ const StepForm: React.FC = () => {
             </section>
           )}
 
-          {/* <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
+          <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
           <pre className="text-sm text-gray-700">
             {JSON.stringify(watch(), null, 2)}
-          </pre> */}
+          </pre>
         </form>
       </div>
     </div>
