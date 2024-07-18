@@ -25,51 +25,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-];
-
 import axios from "axios";
 
 const STEPS_AMOUNT = 3;
@@ -142,7 +97,10 @@ interface FormValues {
 
 const StepForm: React.FC = () => {
   const [formStep, setFormStep] = useState<number>(0);
-  const [id, setId] = useState(1);
+  const [id, setId] = useState<number | null>(null);
+  const [leadId, setLeadId] = useState<number | undefined>(undefined); // Estado para armazenar o ID
+
+  const [leadData, setLeadData] = useState<any>(null);
 
   const [hasClinicalEngineering, setHasClinicalEngineering] =
     useState<string>("nulo");
@@ -211,7 +169,7 @@ const StepForm: React.FC = () => {
     handleSubmit,
     formState: { errors, isValid },
     watch,
-    getValues, // Adicionado para obter os valores do formulário
+    getValues,
   } = useForm<FormValues>({
     mode: "onChange",
     defaultValues: {
@@ -348,20 +306,6 @@ const StepForm: React.FC = () => {
     setFormStep((cur) => cur - 1);
   };
 
-  const onSubmit: SubmitHandler<FormValues> = async (values: FormValues) => {
-    try {
-      const response = await axios.post("http://localhost:8000/lead", values);
-      console.log(`Dados enviados com sucesso: ${id}`, response.data);
-      setId((prevId) => prevId + 1);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Erro da API:", error.response?.data);
-      } else {
-        console.error("Erro ao enviar os dados para a API Submit", error);
-      }
-    }
-  };
-
   interface CheckboxProps {
     id: string;
     checked: boolean;
@@ -399,6 +343,41 @@ const StepForm: React.FC = () => {
         {children}
       </label>
     );
+  };
+
+  const onSubmit: SubmitHandler<FormValues> = async (values: FormValues) => {
+    try {
+      // Envia os dados para o servidor
+      const response = await axios.post("http://localhost:8000/lead", values);
+      console.log("Dados enviados com sucesso:", response.data);
+
+      // Chama getRecommendations com o objeto lead completo
+      await getRecommendations(response.data.lead);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Erro da API:", error.response?.data);
+      } else {
+        console.error("Erro ao enviar os dados para a API:", error);
+      }
+    }
+  };
+
+  const getRecommendations = async (lead: any) => {
+    // 'any' aqui é temporário, use o tipo correto do objeto 'lead'
+    try {
+      // Aqui você pode acessar o ID do lead diretamente
+      const lastId = lead.id;
+      console.log(`O id que está sendo enviado é: ${lastId}`);
+
+      // Faz a requisição GET para obter as recomendações com base no ID do lead
+      const response = await axios.get(`http://localhost:8000/lead/${lastId}`);
+      console.log("Detalhes do lead:", response.data);
+
+      // Você pode fazer o que precisa com os dados recebidos aqui
+      setLeadData(response.data); // Define os dados do lead no estado (assumindo que você está usando useState para 'leadData')
+    } catch (error) {
+      console.error("Erro ao obter recomendações:", error);
+    }
   };
 
   return (
@@ -1315,7 +1294,7 @@ const StepForm: React.FC = () => {
               </button>
             </section>
           )}
-          {formStep === 3 && (
+          {formStep === 3 && leadData && (
             <section>
               <h2 className="font-semibold text-3xl mb-8">
                 Confira o resultado!
@@ -1333,20 +1312,24 @@ const StepForm: React.FC = () => {
                       Modelo
                     </TableHead>
                     <TableHead className="text-right font-bold text-white">
-                      Preço
+                      Faixa de preço
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.invoice}>
-                      <TableCell>Nome da Marca</TableCell>
-                      <TableCell>Modelo 1, Modelo 2</TableCell>
-                      <TableCell className="text-right">
-                        R$0,00 - R$0,00
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {/* Exibir detalhes das autoclaves, verificando se leadData.autoclaves está definido */}
+                  {leadData.autoclaveRecommendations &&
+                    leadData.autoclaveRecommendations.map(
+                      (autoclave: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>{autoclave.nomeMarca}</TableCell>
+                          <TableCell>{autoclave.modeloAutoclave}</TableCell>
+                          <TableCell className="text-right">
+                            R${autoclave.preco}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
                 </TableBody>
               </Table>
               <hr />
@@ -1363,18 +1346,24 @@ const StepForm: React.FC = () => {
                       Modelo
                     </TableHead>
                     <TableHead className="text-right font-bold text-white">
-                      Preço
+                      Faixa de preço
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.invoice}>
-                      <TableCell>Nome da Marca</TableCell>
-                      <TableCell>Modelo 1, Modelo 2</TableCell>
-                      <TableCell className="text-right">R$0,00</TableCell>
-                    </TableRow>
-                  ))}
+                  {/* Exibir detalhes das lavadoras, verificando se leadData.lavadoras está definido */}
+                  {leadData.washerRecommendations &&
+                    leadData.washerRecommendations.map(
+                      (washer: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>{washer.nomeMarca}</TableCell>
+                          <TableCell>{washer.modeloLavadora}</TableCell>
+                          <TableCell className="text-right">
+                            R${washer.preco}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
                 </TableBody>
               </Table>
               <button
@@ -1392,8 +1381,8 @@ const StepForm: React.FC = () => {
             </section>
           )}
 
-          <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p>
-          <pre className="text-sm text-gray-700">
+          {/* <p className="mt-10">{isValid ? "Válido" : "Inválido"}</p> */}
+          <pre className="text-[1px] text-transparent">
             {JSON.stringify(watch(), null, 2)}
           </pre>
         </form>
