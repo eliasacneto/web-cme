@@ -347,11 +347,9 @@ const StepForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormValues> = async (values: FormValues) => {
     try {
-      // Envia os dados para o servidor
       const response = await axios.post("http://localhost:8000/lead", values);
       console.log("Dados enviados com sucesso:", response.data);
 
-      // Chama getRecommendations com o objeto lead completo
       await getRecommendations(response.data.lead);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -363,18 +361,14 @@ const StepForm: React.FC = () => {
   };
 
   const getRecommendations = async (lead: any) => {
-    // 'any' aqui é temporário, use o tipo correto do objeto 'lead'
     try {
-      // Aqui você pode acessar o ID do lead diretamente
       const lastId = lead.id;
       console.log(`O id que está sendo enviado é: ${lastId}`);
 
-      // Faz a requisição GET para obter as recomendações com base no ID do lead
       const response = await axios.get(`http://localhost:8000/lead/${lastId}`);
       console.log("Detalhes do lead:", response.data);
 
-      // Você pode fazer o que precisa com os dados recebidos aqui
-      setLeadData(response.data); // Define os dados do lead no estado (assumindo que você está usando useState para 'leadData')
+      setLeadData(response.data);
     } catch (error) {
       console.error("Erro ao obter recomendações:", error);
     }
@@ -1317,7 +1311,6 @@ const StepForm: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Exibir detalhes das autoclaves, verificando se leadData.autoclaves está definido */}
                   {leadData.autoclaveRecommendations &&
                     leadData.autoclaveRecommendations.map(
                       (autoclave: any, index: number) => (
@@ -1351,7 +1344,6 @@ const StepForm: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Exibir detalhes das lavadoras, verificando se leadData.lavadoras está definido */}
                   {leadData.washerRecommendations &&
                     leadData.washerRecommendations.map(
                       (washer: any, index: number) => (
