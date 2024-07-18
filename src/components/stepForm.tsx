@@ -97,8 +97,8 @@ interface FormValues {
 
 const StepForm: React.FC = () => {
   const [formStep, setFormStep] = useState<number>(0);
-  const [id, setId] = useState<number | null>(null);
-  const [leadId, setLeadId] = useState<number | undefined>(undefined); // Estado para armazenar o ID
+  //   const [id, setId] = useState<number | null>(null);
+  //   const [leadId, setLeadId] = useState<number | undefined>(undefined); // Estado para armazenar o ID
 
   const [leadData, setLeadData] = useState<any>(null);
 
@@ -173,6 +173,7 @@ const StepForm: React.FC = () => {
   } = useForm<FormValues>({
     mode: "onChange",
     defaultValues: {
+      possuiEngenhariaClinica: "Não",
       tipoEngenhariaClinica: "Não selecionado",
       busco: "Não selecionado",
     },
@@ -738,7 +739,7 @@ const StepForm: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
-                      value="não"
+                      value="sim"
                       id="sim"
                       {...register("possuiEngenhariaClinica", {
                         required: {
