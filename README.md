@@ -8,7 +8,8 @@ The project aims to transform an Excel spreadsheet used for sizing sterilization
 
 I developed a Landing page to collect precising and clear information about client registrations, thus mapping future clients and obtaining information about new hospitals under construction.
 
-Check the Manager Portal repository by [clicking here](https://github.com/eliasacneto/web-admin-cme)
+→ Check the Manager Portal repository by [clicking here](https://github.com/eliasacneto/web-admin-cme) <br/>
+→ Check the API repository [clicking here](https://github.com/eliasacneto/api-cme)<br/>
 
 ### Technologies Used
 
